@@ -1,11 +1,14 @@
 import { BrowserRouter, Routes, Route } from "react-router";
-import HomePage from "./pages/MainLayout";
+import Layout from "./components/Layout";
+import DashBoard from "./pages/DashBoard";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<Layout />}>
+          <Route index element={<DashBoard/>}/>
+        </Route>
       </Routes>
     </BrowserRouter>
   );
