@@ -23,9 +23,12 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }) => {
       {/*Logo*/}
       <div className="py-6 px-6 border-b border-gray-200 transition-all duration-200 ">
         <div className="flex items-center space-x-3 ">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--color-fdaa3d)] cursor-pointer shadow-lg`}>
+          <Link 
+          to='/'
+            className={`w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--color-fdaa3d)] cursor-pointer shadow-lg`}
+          >
             <Store className={`w-5 h-5 text-white`} />
-          </div>
+          </Link>
 
           {/*Conditional Rendering*/}
           {!collapsed && (
@@ -57,23 +60,21 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }) => {
             >
               <div className="flex items-center space-x-3">
                 <item.icon className={`w-5 h-5`} />
-                  {!collapsed && (
-                    <>
+                {!collapsed && (
+                  <>
                     <span className="font-medium ml-2">{item.label}</span>
-                     {item.badge && (
-                    <span className="px-2 py-1 text-xs bg-red-500 text-white rounded-full">
-                      {item.badge}
-                    </span>
-                  )}
-                  {item.count && (
-                    <span className="px-2 py-1 text-xs bg-gray-200 text-gray-600 rounded-full">
-                      {item.count}
-                    </span>
-                  
-                  )}
-                    </>
-                  )}
-                
+                    {item.badge && (
+                      <span className="px-2 py-1 text-xs bg-red-500 text-white rounded-full">
+                        {item.badge}
+                      </span>
+                    )}
+                    {item.count && (
+                      <span className="px-2 py-1 text-xs bg-gray-600 text-white rounded-full">
+                        {item.count}
+                      </span>
+                    )}
+                  </>
+                )}
               </div>
               {!collapsed && item.submenu && (
                 <ChevronDown className="w-4 h-4 transition-transform" />
@@ -81,10 +82,21 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }) => {
             </div>
 
             {/* Sub Menu */}
-            {!collapsed && item.submenu && expandedItems.has(item.id) &&(
+            {!collapsed && item.submenu && expandedItems.has(item.id) && (
               <div className="ml-8 mt-2 space-y-1">
                 {item.submenu.map((subitem) => (
-                  <Link to={`/${subitem.id}`} className="flex flex-col w-full text-gray-600 text-left p-2 text-sm hover:text-gray-800 hover:bg-gray-200 rounded-lg transition-all" key={subitem.id}>{subitem.label}</Link>
+                  <Link
+                    to={`/${subitem.id}`}
+                    onClick={() => onPageChange(subitem.id)}
+                    className={`w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 ${
+                      currentPage === subitem.id
+                        ? "bg-[var(--color-febd69)] text-white shadow-lg shadow-gray-500/25"
+                        : "text-gray-600 hover:bg-gray-200"
+                    }`}
+                    key={subitem.id}
+                  >
+                    {subitem.label}
+                  </Link>
                 ))}
               </div>
             )}

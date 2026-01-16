@@ -22,7 +22,7 @@ const Layout = () => {
           />
           <main className="flex-1 overflow-y-auto">
             <div className="p-6 space-y-6">
-              {currentPage === 'dashboard' && <Outlet />}
+               <Outlet />
             </div>
           </main>
         </div>

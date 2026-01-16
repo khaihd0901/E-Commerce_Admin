@@ -1,5 +1,6 @@
 import { useState } from "react";
 import CustomerInput from "../components/CustomerInput";
+import { Link } from "react-router";
 
 const Login = () => {
   const [form, setForm] = useState({
@@ -33,7 +34,8 @@ const Login = () => {
               value={form.email}
               onChange={handleChange}
               placeholder="Enter your email"
-              i_class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              i_class="w-full px-4 py-2 border rounded-lg focus:outline-none 
+            focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all "
               required
             />
           </div>
@@ -47,16 +49,20 @@ const Login = () => {
               value={form.password}
               onChange={handleChange}
               placeholder="Enter your password"
-              i_class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              i_class="w-full px-4 py-2 border rounded-lg focus:outline-none 
+            focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
               required
             />
           </div>
 
           {/* Forgot password */}
           <div className="text-right">
-            <a href="#" className="text-sm text-blue-600 hover:underline">
+            <Link
+              to="/forgot-password"
+              className="text-sm text-blue-600 hover:underline"
+            >
               Forgot your password?
-            </a>
+            </Link>
           </div>
 
           {/* Login Button */}

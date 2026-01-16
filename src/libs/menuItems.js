@@ -1,4 +1,4 @@
-import { BarChart3, LayoutDashboard, MessageCircleCode, ShoppingBag, Users } from "lucide-react";
+import { BarChart3, Database, LayoutDashboard, MessageCircleCode, MessageCircleIcon, ShoppingBag, Users } from "lucide-react";
 
 const menuItems = [
   {
@@ -9,35 +9,42 @@ const menuItems = [
     badge: "New",
   },
   {
-    id: "analytics",
-    icon: BarChart3,
-    label: "Analytics",
+    id: "Catalog",
+    icon: Database,
+    label: "Catalog",
     submenu: [
-      { id: "overview", label: "Overview" },
-      { id: "reports", label: "Reports" },
+      { id: "products", label: "Product List" },
+      { id: "coupons", label: "Coupon List" },
+      { id: "brands", label: "Brand List" },    
+      { id: "categories", label: "Category List" },
+      { id: "colors", label: "Color List" },
     ],
   },
   {
     id: "users",
     icon: Users,
     label: "Users",
-    count:'2.4k',
     submenu: [
       { id: "all-users", label: "All Users" },
       { id: "activity", label: "User Activity" },
     ],
   }, 
   {
-    id: "e-commerce",
+    id: "orders",
     icon: ShoppingBag,
-    label: "Simp1e Store",
+    label: "Orders",
     count:'2.4k',
     submenu: [
-      { id: "products", label: "Products" },
-      { id: "orders", label: "Orders" },
-      { id: "customers", label: "Customers" },
+      { id: "order-list", label: "Orders List" },
+      { id: "order", label: "Order Detail" },
     ],
   },
+  {
+    id:"messages",
+    icon: MessageCircleIcon,
+    label: 'Messages',
+    count: '12'
+  }
 ];
 
 export default menuItems
