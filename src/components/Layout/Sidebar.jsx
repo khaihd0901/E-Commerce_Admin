@@ -86,7 +86,7 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }) => {
               <div className="ml-8 mt-2 space-y-1">
                 {item.submenu.map((subitem) => (
                   <Link
-                    to={`/${subitem.id}`}
+                    to={`${subitem.id}`}
                     onClick={() => onPageChange(subitem.id)}
                     className={`w-full flex items-center justify-between p-3 rounded-xl transition-all duration-200 ${
                       currentPage === subitem.id

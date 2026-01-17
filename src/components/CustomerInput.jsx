@@ -1,10 +1,38 @@
 import React from "react";
 
-const CustomerInput = ({ type, label, i_id, i_class }) => {
+const CustomerInput = ({
+  type,
+  value,
+  label,
+  defaultValue,
+  minLength,
+  maxLength,
+  min,
+  max,
+  i_id,
+  i_class,
+  onChange,
+  onBlur,
+}) => {
   return (
     <div className="flex flex-col">
-      <label className="py-2 capitalize" htmlFor={label}>{label}</label>
-      <input id={i_id} type={type} placeholder={`Type your ${label} here`} className={i_class} />
+      <label className="py-1 font-medium capitalize" htmlFor={label}>
+        {label}
+      </label>
+      <input
+        id={i_id}
+        type={type}
+        value={value}
+        min={min}
+        max={max}
+        minLength={minLength}
+        maxLength={maxLength}
+        placeholder={`Enter ${label}`}
+        className={i_class}
+        defaultValue={defaultValue}
+        onChange={onChange}
+        onBlur={onBlur}
+      />
     </div>
   );
 };

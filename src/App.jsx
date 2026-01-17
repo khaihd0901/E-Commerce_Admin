@@ -14,15 +14,15 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/" element={<Layout />}>
+        <Route path="admin" element={<Layout />}>
           <Route index element={<DashBoard />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/categories" element={<Categories />} />
-          <Route path="/brands" element={<Brands />} />
-          <Route path="/coupons" element={<Coupons />} />
-          <Route path="/orders" element={<Orders />} />
+          <Route path="products" element={<Products />} />
+          <Route path="categories" element={<Categories />} />
+          <Route path="brands" element={<Brands />} />
+          <Route path="coupons" element={<Coupons />} />
+          <Route path="orders" element={<Orders />} />
 
         </Route>
       </Routes>

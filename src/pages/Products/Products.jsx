@@ -1,26 +1,40 @@
-import { useState } from "react";
-import ProductTable from "./ProductTable";
-import AddProductModal from "./AddProductModal";
-import ProductDetailModal from "./ProductDetailModal";
-
+import { useEffect, useState } from "react";
+import Table from "../../components/TableModal/Table";
+import AddProduct from "./AddProduct";
+import DetailModal from "../../components/TableModal/DetailModal";
+import {getProducts} from '../../services/productService/productSlice'
+import {useDispatch, useSelector} from 'react-redux'
 export default function Product() {
-  const [products, setProducts] = useState([
-    { id: 1, name: "iPhone 15", price: 1200, description: "Apple phone" },
-    { id: 2, name: "MacBook Pro", price: 2200, description: "Apple laptop" },
-  ]);
+  const dispatch = useDispatch();
 
   const [showAdd, setShowAdd] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
   const addProduct = (product) => {
-    setProducts([...products, { ...product, id: Date.now() }]);
     setShowAdd(false);
   };
 
   const deleteProduct = (id) => {
-    setProducts(products.filter((p) => p.id !== id));
+
   };
 
+  useEffect(()=>{
+    dispatch(getProducts())
+  },[])
+
+  const customerState = useSelector((state) => state.product.products)
+  const products = []
+  for(let i=0; i < customerState.length; i++){
+      products.push({
+        key: i+1,
+        name: customerState[i].productName,
+        category: customerState[i].category,
+        stock: customerState[i].stock,
+        price: customerState[i].price,
+        ratingsQuantity: customerState[i].ratingsQuantity
+      })
+  }
+  
   return (
     <div className="p-6 bg-gray-50 min-h-screen rounded-xl shadow">
       <div className="flex justify-between mb-6">
@@ -33,21 +47,21 @@ export default function Product() {
         </button>
       </div>
 
-      <ProductTable
-        products={products}
+      <Table
+        data={products}
         onDelete={deleteProduct}
         onView={setSelectedProduct}
       />
 
       {showAdd && (
-        <AddProductModal
+        <AddProduct
           onClose={() => setShowAdd(false)}
           onAdd={addProduct}
         />
       )}
 
       {selectedProduct && (
-        <ProductDetailModal
+        <DetailModal
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
         />

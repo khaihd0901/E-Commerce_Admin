@@ -1,6 +1,6 @@
 import Modal from "./Modal";
 
-export default function ProductDetailModal({ product, onClose }) {
+export default function DetailModal({ product, onClose }) {
   return (
     <Modal onClose={onClose}>
       <h2 className="text-lg font-semibold mb-4">Product Detail</h2>
