@@ -1,15 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import authService from "./authService";
 
-// const userDefaultState = {
-//     _id:null,
-//     email:null,
-//     phone:null,
-//     token:null,
-// }
-
 const getUser = localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null
-
 
 const initialState = {
     user: getUser,
@@ -22,6 +14,14 @@ const initialState = {
 export const login = createAsyncThunk('auth/admin-login', async(user, thunkAPI) =>{
     try{
         return await authService.login(user)
+    }catch(err){
+        return thunkAPI.rejectWithValue(err)
+    }
+})
+
+export const logout = createAsyncThunk('auth/signout', async(thunkAPI) =>{
+    try{
+        return await authService.logout()
     }catch(err){
         return thunkAPI.rejectWithValue(err)
     }
@@ -43,6 +43,20 @@ export const authSlice = createSlice({
             state.user=action.payload   
         })
         .addCase(login.rejected, (state)=>{
+            state.isLoading=false;
+            state.isError=true;
+            state.isSuccess=false;
+            state.user=null   
+        })
+        .addCase(logout.pending, (state) =>{
+            state.isLoading = true;
+        })
+        .addCase(logout.fulfilled, (state)=>{
+            state.isLoading=false;
+            state.isSuccess=true;
+            state.user=null
+        })
+        .addCase(logout.rejected, (state)=>{
             state.isLoading=false;
             state.isError=true;
             state.isSuccess=false;

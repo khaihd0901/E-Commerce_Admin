@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
+import { getBrands } from "../../services/brandService/brandSlice";
+import { useDispatch, useSelector } from "react-redux";
 import Table from "../../components/TableModal/Table";
-import AddModal from "../Products/AddProduct";
 import DetailModal from "../../components/TableModal/DetailModal";
-import {getBrands} from '../../services/brandService/brandSlice'
-import {useDispatch, useSelector} from 'react-redux'
 import AddBrand from "./AddBrand";
 export default function Brands() {
   const dispatch = useDispatch();
@@ -15,22 +14,20 @@ export default function Brands() {
     setShowAdd(false);
   };
 
-  const deleteProduct = (id) => {
+  const deleteProduct = (id) => {};
 
-  };
+  useEffect(() => {
+    dispatch(getBrands());
+  }, []);
 
-  useEffect(()=>{
-    dispatch(getBrands())
-  },[])
-
-  const brandState = useSelector((state) => state.brand.brands)
-  console.log(brandState)
-  const brands = []
-  for(let i=0; i < brandState?.length; i++){
-      brands.push({
-        key: i+1,
-        name: brandState[i].name,
-      })
+  const brandState = useSelector((state) => state.brand.brands);
+  console.log(brandState);
+  const brands = [];
+  for (let i = 0; i < brandState?.length; i++) {
+    brands.push({
+      key: i + 1,
+      name: brandState[i].name,
+    });
   }
   return (
     <div className="p-6 bg-gray-50 min-h-screen rounded-xl shadow">
@@ -44,17 +41,10 @@ export default function Brands() {
         </button>
       </div>
 
-      <Table
-        data={brands}
-        onDelete={deleteProduct}
-        onView={setSelectedBrand}
-      />
+      <Table data={brands} onDelete={deleteProduct} onView={setSelectedBrand} />
 
       {showAdd && (
-        <AddBrand
-          onClose={() => setShowAdd(false)}
-          onAdd={addBrand}
-        />
+        <AddBrand onClose={() => setShowAdd(false)} onAdd={addBrand} />
       )}
 
       {selectedBrand && (

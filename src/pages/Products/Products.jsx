@@ -17,11 +17,9 @@ export default function Product() {
   const deleteProduct = (id) => {
 
   };
-
   useEffect(()=>{
     dispatch(getProducts())
   },[])
-
   const customerState = useSelector((state) => state.product.products)
   const products = []
   for(let i=0; i < customerState.length; i++){
@@ -34,7 +32,7 @@ export default function Product() {
         ratingsQuantity: customerState[i].ratingsQuantity
       })
   }
-  
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen rounded-xl shadow">
       <div className="flex justify-between mb-6">

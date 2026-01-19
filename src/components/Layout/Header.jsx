@@ -10,9 +10,20 @@ import {
   Settings,
   User,
 } from "lucide-react";
+import { logout } from "../../services/authService/authSlice";
+import { useNavigate } from "react-router";
+import { useDispatch } from "react-redux";
+
 const Header = ({ onToggleSidebar }) => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
 
+  const handleLogOut = () =>{
+    dispatch(logout());
+    localStorage.clear();
+    navigate('/')
+  }
   return (
     <div className="bg-white/80 backdrop-blur-xl border-b border-gray-200/50 px-6 py-4 relative">
       <div className="flex items-center justify-between">
@@ -103,7 +114,9 @@ const Header = ({ onToggleSidebar }) => {
           </div>
 
           {/* Footer */}
-          <div className="border-t border-gray-300 py-2">
+          <div
+          onClick={handleLogOut}
+           className="border-t border-gray-300 py-2">
             <DropdownItem icon={<LogOut size={16} />} text="Sign out" danger />
           </div>
         </div>

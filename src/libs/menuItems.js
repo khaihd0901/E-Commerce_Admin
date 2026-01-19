@@ -17,7 +17,17 @@ const menuItems = [
       { id: "coupons", label: "Coupon List" },
       { id: "brands", label: "Brand List" },    
       { id: "categories", label: "Category List" },
-      { id: "colors", label: "Color List" },
+      // { id: "colors", label: "Color List" },
+    ],
+  },
+  {
+    id: "orders",
+    icon: ShoppingBag,
+    label: "Orders",
+    count:'2.4k',
+    submenu: [
+      { id: "order-list", label: "Orders List" },
+      // { id: "order", label: "Order Detail" },
     ],
   },
   {
@@ -26,19 +36,9 @@ const menuItems = [
     label: "Users",
     submenu: [
       { id: "all-users", label: "All Users" },
-      { id: "activity", label: "User Activity" },
+      // { id: "activity", label: "User Activity" },
     ],
   }, 
-  {
-    id: "orders",
-    icon: ShoppingBag,
-    label: "Orders",
-    count:'2.4k',
-    submenu: [
-      { id: "order-list", label: "Orders List" },
-      { id: "order", label: "Order Detail" },
-    ],
-  },
   {
     id:"messages",
     icon: MessageCircleIcon,

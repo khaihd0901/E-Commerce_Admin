@@ -9,9 +9,14 @@ const login = async(userData) =>{
     }
     return res.data
 }
+const logout = async() =>{
+    const res = await axios.post(`${base_url}/auth/signout`)
+    return res.data
+}
 
 const authService = {
     login,
+    logout
 }
 
 export default authService

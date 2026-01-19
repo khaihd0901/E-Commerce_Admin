@@ -3,15 +3,17 @@ import Layout from "./components/Layout/Layout";
 import DashBoard from "./pages/Dashboards/Dashboards";
 import Products from "./pages/Products/Products";
 import Login from "./pages/Login";
-import Orders from "./pages/Orders";
+import Orders from "./pages/Orders/Orders";
 import ForgotPassword from "./pages/ForgotPassword";
 import Categories from './pages/Categories/Categories'
 import Brands from './pages/Brands/Brands'
 import Coupons from './pages/Coupons/Coupons'
-
-
+import Users from './pages/Users/Users'
+import { Toaster } from "sonner";
 function App() {
   return (
+    <>
+    <Toaster richColors />
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Login />} />
@@ -22,11 +24,13 @@ function App() {
           <Route path="categories" element={<Categories />} />
           <Route path="brands" element={<Brands />} />
           <Route path="coupons" element={<Coupons />} />
-          <Route path="orders" element={<Orders />} />
+          <Route path="order-list" element={<Orders />} />
+          <Route path="all-users" element={<Users/>} />
 
         </Route>
       </Routes>
     </BrowserRouter>
+    </>
   );
 }
 

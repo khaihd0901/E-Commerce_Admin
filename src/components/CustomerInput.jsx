@@ -4,7 +4,6 @@ const CustomerInput = ({
   type,
   value,
   label,
-  defaultValue,
   minLength,
   maxLength,
   min,
@@ -29,7 +28,6 @@ const CustomerInput = ({
         maxLength={maxLength}
         placeholder={`Enter ${label}`}
         className={i_class}
-        defaultValue={defaultValue}
         onChange={onChange}
         onBlur={onBlur}
       />
