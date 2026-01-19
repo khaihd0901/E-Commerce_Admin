@@ -30,10 +30,24 @@ const createProduct = async (data) => {
     toast.error("Create Product False");
   }
 };
+
+const getProductById = async(id) =>{
+  const res = await api.get(`${base_url}/product/${id}`)
+  return res.data
+}
+
+const updateProduct = async(data) =>{
+  const res = await api.put(`${base_url}/product/update/:id`,data)
+  return res.data
+}
+
+
 const productService = {
   getProducts,
   createProduct,
   uploadProductImage,
+  updateProduct,
+  getProductById,
 };
 
 export default productService;

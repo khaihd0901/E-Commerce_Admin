@@ -3,6 +3,7 @@ import CustomerInput from "../../components/CustomerInput";
 import {
   createProduct,
   uploadProductImage,
+  getProductById
 } from "../../services/productService/productSlice";
 import { getCategories } from "../../services/categoryService/categorySlice";
 import { getBrands } from "../../services/brandService/brandSlice";
@@ -13,15 +14,18 @@ import * as Yup from "yup";
 import { useEffect, useState } from "react";
 import UploadImage from "./UploadImage";
 
-export default function AddProductModal({ onClose }) {
-  const [images, setImages] = useState();
+const DetailProduct = ({ onClose, prodId }) => {
+const [images, setImages] = useState();
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(getBrands());
     dispatch(getCategories());
+    dispatch(getProductById(prodId))
   }, []);
   const brandState = useSelector((state) => state.brand.brands);
   const CateState = useSelector((state) => state.category.categories);
+  const proState = useSelector((state) => state.product.product);
+
 
   let validationSchema = Yup.object({
     productName: Yup.string().required("Email is required"),
@@ -50,6 +54,7 @@ export default function AddProductModal({ onClose }) {
         ...values,
         images: uploaded,
       };
+      console.log(payload)
       dispatch(createProduct(payload))
     },
   });
@@ -57,16 +62,15 @@ export default function AddProductModal({ onClose }) {
     if (!files || files.length === 0) return; // 🛑 IMPORTANT
     setImages(files);
   };
-  
   return (
-    <Modal onClose={onClose} onSubmit={formik.handleSubmit}>
-      {/* Add product */}
+    <Modal onClose={onClose}>
+      <h2 className="text-lg font-semibold mb-4">Product Detail</h2>
       <div className="p-4 bg-gray-100 min-w-5xl">
         <div className="grid grid-cols-12 gap-4">
           {/* LEFT: PRODUCT IMAGE */}
           <div className="col-span-12 lg:col-span-4 space-y-6">
             <div className="w-full h-56">
-              <UploadImage onChange={handleImagesChange} />
+              <UploadImage onChange={handleImagesChange} images={proState?.images} />
             </div>
           </div>
 
@@ -81,7 +85,7 @@ export default function AddProductModal({ onClose }) {
               <div className="space-y-4">
                 <CustomerInput
                   onChange={formik.handleChange("productName")}
-                  value={formik.values.productName}
+                  value={proState.productName}
                   type="text"
                   label="product name"
                   i_class="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
@@ -99,7 +103,7 @@ export default function AddProductModal({ onClose }) {
                     <span className="font-medium">Product type</span>
                     <select
                       name="category"
-                      value={formik.values.category}
+                      value={proState.category}
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       className="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
@@ -119,7 +123,7 @@ export default function AddProductModal({ onClose }) {
                     <span className="font-medium">Product brand</span>
                     <select
                       name="brand"
-                      value={formik.values.brand}
+                      value={proState.brand}
                       onChange={formik.handleChange}
                       onBlur={formik.handleBlur}
                       className="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
@@ -137,7 +141,7 @@ export default function AddProductModal({ onClose }) {
 
                   <CustomerInput
                     onChange={formik.handleChange("price")}
-                    value={formik.values.price}
+                    value={proState.price}
                     type="text"
                     label="price"
                     defaultValue="$100.00"
@@ -149,7 +153,7 @@ export default function AddProductModal({ onClose }) {
                 <div className="grid grid-cols-1 gap-4">
                   <CustomerInput
                     onChange={formik.handleChange("tags")}
-                    value={formik.values.tags}
+                    value={proState.tags}
                     type="text"
                     label="product tag"
                     placeholder="Type and enter"
@@ -161,7 +165,7 @@ export default function AddProductModal({ onClose }) {
 
                 <textarea
                   onChange={formik.handleChange("des")}
-                  value={formik.values.des}
+                  value={proState.des}
                   maxLength={200}
                   className="border rounded-xl px-3 py-2 w-full min-h-50 bg-gray-100 border border-gray-300
             rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
@@ -181,7 +185,7 @@ export default function AddProductModal({ onClose }) {
                   /> */}
                   <CustomerInput
                     onChange={formik.handleChange("stock")}
-                    value={formik.values.stock}
+                    value={proState.stock}
                     defaultValue={1}
                     min={1}
                     max={1000}
@@ -199,17 +203,14 @@ export default function AddProductModal({ onClose }) {
       </div>
 
       {/* Btn function */}
-      <div className="flex justify-end gap-2">
-        <button onClick={onClose} className="border px-4 py-2 rounded-lg">
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg"
-        >
-          Add
+      <div className="flex justify-end gap-2"></div>
+      <div className="flex justify-end mt-4">
+        <button onClick={onClose} className="bg-gray-100 px-4 py-2 rounded-lg">
+          Close
         </button>
       </div>
     </Modal>
   );
-}
+};
+
+export default DetailProduct;

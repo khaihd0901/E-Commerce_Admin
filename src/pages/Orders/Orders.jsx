@@ -8,7 +8,7 @@ const Orders = () => {
       const dispatch = useDispatch();
   const [selectOrder, setSelectOrder] = useState(null);
 
-  const deleteOrder = (id) => {};
+  // const deleteOrder = (id) => {};
 
   useEffect(() => {
     dispatch(getUserOrders());
@@ -35,7 +35,7 @@ const Orders = () => {
 
       <Table
         data={orders}
-        onDelete={deleteOrder}
+        // onDelete={deleteOrder}
         onView={setSelectOrder}
       />
 

@@ -1,13 +1,15 @@
 import { useState, useRef, useEffect } from "react";
 import { Upload, X } from "lucide-react";
 
-const UploadImage = ({ onChange }) => {
+const UploadImage = ({ onChange, images }) => {
   const inputRef = useRef(null);
 
   const [files, setFiles] = useState([]);
   const [previews, setPreviews] = useState([]);
   const [activeId, setActiveId] = useState(null);
-
+  // if(images?.length > 0){
+  //   setPreviews(images)
+  // }
   // ===== SELECT FILES =====
   const handleSelectFiles = (e) => {
     const selected = Array.from(e.target.files);
@@ -30,11 +32,14 @@ const UploadImage = ({ onChange }) => {
   const handleRemove = (index) => {
     setPreviews((prev) => {
       const removed = prev[index];
-      URL.revokeObjectURL(removed.url);
+
+      // only revoke blob URLs
+      if (removed.file) {
+        URL.revokeObjectURL(removed.url);
+      }
 
       const updated = prev.filter((_, i) => i !== index);
 
-      // if removed image was active → select another
       if (removed.id === activeId) {
         setActiveId(updated[0]?.id ?? null);
       }
@@ -42,11 +47,12 @@ const UploadImage = ({ onChange }) => {
       return updated;
     });
 
+    // only remove from files if it's a new file
     setFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
   // ===== ACTIVE IMAGE =====
-  const activeImage = previews.find((img) => img.id === activeId);
+  const activeImage = previews.find((img) => img.id === activeId || img.asset_id === activeId);
 
   // ===== SEND FILES TO PARENT =====
   useEffect(() => {
@@ -58,6 +64,29 @@ const UploadImage = ({ onChange }) => {
     return () => previews.forEach((p) => URL.revokeObjectURL(p.url));
   }, []);
 
+  useEffect(() => {
+    if (!images || images.length === 0) return;
+
+    // prevent re-hydrating if previews already exist
+    setPreviews((prev) => {
+      if (prev.length > 0) return prev;
+
+      const mapped = images.map((url) => ({
+        id: crypto.randomUUID(),
+        asset_id: url.asset_id,
+        url: url.url,
+        file: null, // existing image
+      }));
+
+      // set first image as active
+      setActiveId(mapped[0].asset_id ?? null);
+      return mapped;
+    });
+  }, [images]);
+  
+  console.log(activeId)
+  console.log("previews :", previews)
+  console.log("images :", images)
   return (
     <div className="bg-gray-100 rounded-xl border border-gray-200 shadow-xl p-4 space-y-4">
       <h3 className="font-semibold">Product Images</h3>
@@ -108,7 +137,7 @@ const UploadImage = ({ onChange }) => {
                 }`}
             >
               <img
-                src={img.url}
+                src={img.url.url || img.url}
                 alt=""
                 className="h-24 w-full object-cover rounded"
               />

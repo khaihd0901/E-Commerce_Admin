@@ -10,21 +10,21 @@ export default function Table({ data, onDelete, onView }) {
           header: formatHeader(key),
         }))
     : [];
+
   return (
     <div className="bg-white overflow-hidden">
       <table className="w-full text-sm">
         <thead className="bg-gray-200">
           <tr>
             <th className="text-left px-4 py-3">No.</th>
-            {columns.map((col) => (
-              <th className="text-left px-4 py-3">{col.header}</th>
+            {columns.map((col,i) => (
+              <th key={i} className="text-left px-4 py-3">{col.header}</th>
             ))}
             <th className="text-right px-4 py-3">Actions</th>
           </tr>
         </thead>
         <tbody>
           {data?.map((d, index) => (
-            <>
               <tr key={index} className="border-t border-gray-200">
                 <td className="px-4 py-3">{d.key}</td>
                 {columns.map((col, index) => (
@@ -47,7 +47,6 @@ export default function Table({ data, onDelete, onView }) {
                   </button>
                 </td>
               </tr>
-            </>
           ))}
         </tbody>
       </table>

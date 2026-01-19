@@ -1,38 +1,43 @@
 import { useEffect, useState } from "react";
 import Table from "../../components/TableModal/Table";
 import AddProduct from "./AddProduct";
-import DetailModal from "../../components/TableModal/DetailModal";
-import {getProducts} from '../../services/productService/productSlice'
-import {useDispatch, useSelector} from 'react-redux'
+import DetailProduct from "./DetailProduct";
+import { getProducts } from "../../services/productService/productSlice";
+import { useDispatch, useSelector } from "react-redux";
 export default function Product() {
   const dispatch = useDispatch();
-
+  const [prodId , setProdId] = useState(null)
   const [showAdd, setShowAdd] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
 
-  const addProduct = (product) => {
+  const addProduct = () => {
     setShowAdd(false);
   };
 
-  const deleteProduct = (id) => {
+  // const deleteProduct = (id) => {
 
-  };
-  useEffect(()=>{
-    dispatch(getProducts())
-  },[])
-  const customerState = useSelector((state) => state.product.products)
-  const products = []
-  for(let i=0; i < customerState.length; i++){
-      products.push({
-        key: i+1,
-        name: customerState[i].productName,
-        category: customerState[i].category,
-        stock: customerState[i].stock,
-        price: customerState[i].price,
-        ratingsQuantity: customerState[i].ratingsQuantity
-      })
+  // };
+  useEffect(() => {
+    dispatch(getProducts());
+  }, []);
+  const customerState = useSelector((state) => state.product.products);
+  const products = [];
+  for (let i = 0; i < customerState.length; i++) {
+    products.push({
+      key: i + 1,
+      id: customerState[i]._id,
+      name: customerState[i].productName,
+      category: customerState[i].category?.categoryName,
+      brand: customerState[i].brand?.name,
+      stock: customerState[i].stock,
+      price: customerState[i].price,
+      ratingsQuantity: customerState[i].ratingsQuantity,
+    });
   }
-
+  const handleView = (e) =>{
+    setSelectedProduct(true)
+    setProdId(e.id)
+  }
   return (
     <div className="p-6 bg-gray-50 min-h-screen rounded-xl shadow">
       <div className="flex justify-between mb-6">
@@ -47,21 +52,23 @@ export default function Product() {
 
       <Table
         data={products}
-        onDelete={deleteProduct}
-        onView={setSelectedProduct}
+        // onDelete={deleteProduct}
+        onView={e => handleView(e)}
       />
 
       {showAdd && (
-        <AddProduct
-          onClose={() => setShowAdd(false)}
-          onAdd={addProduct}
-        />
+        <AddProduct onClose={() => setShowAdd(false)} onAdd={addProduct} />
       )}
 
       {selectedProduct && (
-        <DetailModal
-          product={selectedProduct}
-          onClose={() => setSelectedProduct(null)}
+        <DetailProduct
+
+          prodId={prodId}
+          onClose={() => setSelectedProduct(false)}
+          // onSubmit={(data) => {
+          //   dispatch(updateProduct(data));
+          //   setOpen(false);
+          // }}
         />
       )}
     </div>
