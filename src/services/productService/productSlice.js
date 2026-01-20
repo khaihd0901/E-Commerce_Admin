@@ -27,9 +27,9 @@ export const uploadProductImage = createAsyncThunk('upload-image', async(images,
     }
 })
 
-export const updateProduct = createAsyncThunk('update-product', async(data,thunkAPI)=>{
+export const updateProduct = createAsyncThunk('update-product', async({id,data},thunkAPI)=>{
     try{
-        return await productService.updateProduct(data)
+        return await productService.updateProduct(id,data)
     }catch(err){
         return thunkAPI.rejectWithValue(err)
     }
@@ -44,20 +44,32 @@ export const getProductById = createAsyncThunk('get-product', async(id,thunkAPI)
 })
 
 const initialState = {
-    product:[] ,
-    products: [],
-    images:[],
-    newProduct:[],
-    isLoading: false,
-    isError: false,
-    isSuccess: false,
-    message: ''
-}
-
+  product: null,
+  products: [],
+  images: [],
+  newProduct: null,
+  isLoading: false,
+  isError: false,
+  isSuccess: false,
+  message: ''
+};
 export const productSlice = createSlice({
     name: 'products',
     initialState,
-    reducers: {},
+    reducers: {
+        clearProduct: (state) => {
+      state.product = null;
+    },
+    clearImages: (state) => {
+      state.images = [];
+    },
+    resetProductState: (state) => {
+      state.isLoading = false;
+      state.isError = false;
+      state.isSuccess = false;
+      state.message = '';
+    }
+    },
     extraReducers: (builder) =>{
         builder
         .addCase(getProducts.pending, (state)=>{
@@ -79,7 +91,7 @@ export const productSlice = createSlice({
         })
         .addCase(createProduct.fulfilled, (state,action)=>{
             state.isLoading = false;
-            state.isSuccess = true,
+            state.isSuccess = true;
             state.newProduct = action.payload
         })
         .addCase(createProduct.rejected, (state)=>{
@@ -93,7 +105,7 @@ export const productSlice = createSlice({
         })
         .addCase(uploadProductImage.fulfilled, (state,action)=>{
             state.isLoading = false;
-            state.isSuccess = true,
+            state.isSuccess = true;
             state.images = action.payload
         })
         .addCase(uploadProductImage.rejected, (state)=>{
@@ -107,7 +119,7 @@ export const productSlice = createSlice({
         })
         .addCase(updateProduct.fulfilled, (state,action)=>{
             state.isLoading = false;
-            state.isSuccess = true,
+            state.isSuccess = true;
             state.products = action.payload
         })
         .addCase(updateProduct.rejected, (state)=>{
@@ -121,7 +133,7 @@ export const productSlice = createSlice({
         })
         .addCase(getProductById.fulfilled, (state,action)=>{
             state.isLoading = false;
-            state.isSuccess = true,
+            state.isSuccess = true;
             state.product = action.payload
         })
         .addCase(getProductById.rejected, (state)=>{
@@ -133,4 +145,12 @@ export const productSlice = createSlice({
     }
 })
 
-export default productSlice.reducer
+// ✅ EXPORT ACTIONS
+export const {
+  clearProduct,
+  clearImages,
+  resetProductState
+} = productSlice.actions;
+
+// ✅ EXPORT REDUCER (DEFAULT)
+export default productSlice.reducer;

@@ -14,7 +14,7 @@ const uploadProductImage = async (files) => {
     formData.append("images", file);
   });
   const res = await api.put(`${base_url}/product/upload`, formData);
-  if (res) {
+  if (res.data) {
     return res.data;
   } else {
     toast.error("Image Upload False");
@@ -36,8 +36,9 @@ const getProductById = async(id) =>{
   return res.data
 }
 
-const updateProduct = async(data) =>{
-  const res = await api.put(`${base_url}/product/update/:id`,data)
+const updateProduct = async(id,data) =>{
+  console.log(id)
+  const res = await api.put(`${base_url}/product/update/${id}`,data)
   return res.data
 }
 

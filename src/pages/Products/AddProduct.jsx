@@ -16,12 +16,15 @@ import UploadImage from "./UploadImage";
 export default function AddProductModal({ onClose }) {
   const [images, setImages] = useState();
   const dispatch = useDispatch();
+
   useEffect(() => {
     dispatch(getBrands());
     dispatch(getCategories());
-  }, []);
+  }, [dispatch]);
+
   const brandState = useSelector((state) => state.brand.brands);
   const CateState = useSelector((state) => state.category.categories);
+  const { isLoading } = useSelector((state) => state.product);
 
   let validationSchema = Yup.object({
     productName: Yup.string().required("Email is required"),
@@ -32,6 +35,7 @@ export default function AddProductModal({ onClose }) {
     des: Yup.string().required("Password is required"),
     stock: Yup.string().required("Stock is required"),
   });
+
   const formik = useFormik({
     initialValues: {
       images: images,
@@ -43,42 +47,59 @@ export default function AddProductModal({ onClose }) {
       des: "",
       stock: "",
     },
-    validationSchema: validationSchema,
+    validationSchema,
     onSubmit: async (values) => {
-      const uploaded = await dispatch(uploadProductImage(images)).unwrap();
-      const payload = {
-        ...values,
-        images: uploaded,
-      };
-      dispatch(createProduct(payload))
+      try {
+        const uploaded = await dispatch(uploadProductImage(images)).unwrap();
+        const payload = {
+          ...values,
+          images: uploaded,
+        };
+        dispatch(createProduct(payload));
+      } catch (error) {
+        console.log(error);
+      }
     },
   });
-  const handleImagesChange = async (files) => {
-    if (!files || files.length === 0) return; // 🛑 IMPORTANT
+
+  const handleImagesChange = (files) => {
+    if (!files || files.length === 0) return;
     setImages(files);
   };
-  
+
   return (
     <Modal onClose={onClose} onSubmit={formik.handleSubmit}>
-      {/* Add product */}
-      <div className="p-4 bg-gray-100 min-w-5xl">
-        <div className="grid grid-cols-12 gap-4">
-          {/* LEFT: PRODUCT IMAGE */}
-          <div className="col-span-12 lg:col-span-4 space-y-6">
-            <div className="w-full h-56">
-              <UploadImage onChange={handleImagesChange} />
+      {/* 🔥 RELATIVE WRAPPER */}
+      <div className="relative">
+
+        {/* 🔥 LOADING OVERLAY */}
+        {isLoading && (
+          <div className="absolute inset-0 z-50 bg-white/70 flex items-center justify-center rounded-xl">
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+              <p className="text-sm text-gray-600 font-medium">
+                Creating product...
+              </p>
             </div>
           </div>
+        )}
 
-          {/* RIGHT: GENERAL INFO */}
-          <div className="col-span-12 lg:col-span-8 space-y-6">
-            {/* GENERAL INFORMATION */}
-            <div className="bg-gray-100 rounded-xl border border-gray-200 shadow-xl p-4">
-              <div className="flex justify-between items-center mb-4">
-                <h3 className="font-semibold">General Information</h3>
+        {/* FORM */}
+        <div className="p-4 bg-gray-100 min-w-5xl">
+          <div className="grid grid-cols-12 gap-4">
+            {/* LEFT */}
+            <div className="col-span-12 lg:col-span-4 space-y-6">
+              <div className="w-full h-56">
+                <UploadImage onChange={handleImagesChange} />
               </div>
+            </div>
 
-              <div className="space-y-4">
+            {/* RIGHT */}
+            <div className="col-span-12 lg:col-span-8 space-y-6">
+              <div className="bg-gray-100 rounded-xl border border-gray-200 shadow-xl p-4">
+                <h3 className="font-semibold mb-4">General Information</h3>
+
+                              <div className="space-y-4">
                 <CustomerInput
                   onChange={formik.handleChange("productName")}
                   value={formik.values.productName}
@@ -168,17 +189,7 @@ export default function AddProductModal({ onClose }) {
             focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
                   placeholder="Description"
                 />
-
                 <div className="grid grid-cols-2 gap-4">
-                  {/* <CustomerInput
-                                                                          onChange={formik.handleChange("ex")}
-                    value={formik.values.ex}
-                    type="date"
-                    label="expiration date"
-                    i_class="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
-            rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
-            focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
-                  /> */}
                   <CustomerInput
                     onChange={formik.handleChange("stock")}
                     value={formik.values.stock}
@@ -193,22 +204,30 @@ export default function AddProductModal({ onClose }) {
                   />
                 </div>
               </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Btn function */}
-      <div className="flex justify-end gap-2">
-        <button onClick={onClose} className="border px-4 py-2 rounded-lg">
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg"
-        >
-          Add
-        </button>
+        {/* BUTTONS */}
+        <div className="flex justify-end gap-2 mt-4">
+          <button
+            onClick={onClose}
+            type="button"
+            disabled={isLoading}
+            className="border px-4 py-2 rounded-lg disabled:opacity-50"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg disabled:opacity-50"
+          >
+            Add
+          </button>
+        </div>
       </div>
     </Modal>
   );

@@ -22,7 +22,7 @@ const Header = ({ onToggleSidebar }) => {
   const handleLogOut = () =>{
     dispatch(logout());
     localStorage.clear();
-    navigate('/')
+    navigate()
   }
   return (
     <div className="bg-white/80 backdrop-blur-xl border-b border-gray-200/50 px-6 py-4 relative">
@@ -96,7 +96,7 @@ const Header = ({ onToggleSidebar }) => {
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute right-1 mt-4 w-64 bg-white rounded-xl shadow-lg z-50">
+        <div className="absolute right-1 mt-4 w-64 bg-white rounded-xl shadow-lg z-auto">
           {/* Header */}
           <div className="px-4 py-3">
             <p className="font-semibold text-sm">Musharof Chowdhury</p>
