@@ -10,7 +10,7 @@ import { getBrands } from "../../services/brandService/brandSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import UploadImage from "./UploadImage";
 
 export default function AddProductModal({ onClose }) {
@@ -24,7 +24,7 @@ export default function AddProductModal({ onClose }) {
 
   const brandState = useSelector((state) => state.brand.brands);
   const CateState = useSelector((state) => state.category.categories);
-  const { isLoading } = useSelector((state) => state.product);
+  const { isLoading, isSuccess } = useSelector((state) => state.product);
 
   let validationSchema = Yup.object({
     productName: Yup.string().required("Email is required"),
@@ -61,7 +61,11 @@ export default function AddProductModal({ onClose }) {
       }
     },
   });
-
+  useCallback(() => {
+    if (isSuccess) {
+      onClose(true);
+    }
+  }, [isSuccess,onClose]);
   const handleImagesChange = (files) => {
     if (!files || files.length === 0) return;
     setImages(files);
@@ -71,7 +75,6 @@ export default function AddProductModal({ onClose }) {
     <Modal onClose={onClose} onSubmit={formik.handleSubmit}>
       {/* 🔥 RELATIVE WRAPPER */}
       <div className="relative">
-
         {/* 🔥 LOADING OVERLAY */}
         {isLoading && (
           <div className="absolute inset-0 z-50 bg-white/70 flex items-center justify-center rounded-xl">
@@ -99,111 +102,111 @@ export default function AddProductModal({ onClose }) {
               <div className="bg-gray-100 rounded-xl border border-gray-200 shadow-xl p-4">
                 <h3 className="font-semibold mb-4">General Information</h3>
 
-                              <div className="space-y-4">
-                <CustomerInput
-                  onChange={formik.handleChange("productName")}
-                  value={formik.values.productName}
-                  type="text"
-                  label="product name"
-                  i_class="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
-            rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
-            focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
-                  placeholder="Product Name"
-                />
-                {formik.touched.productName && formik.errors.productName ? (
-                  <div className="text-red-500 text-sm">
-                    {formik.errors.productName}
-                  </div>
-                ) : null}
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="flex flex-col gap-2">
-                    <span className="font-medium">Product type</span>
-                    <select
-                      name="category"
-                      value={formik.values.category}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      className="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
-    rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
-    focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
-                    >
-                      <option value="">Select category</option>
-                      {CateState.map((c, index) => (
-                        <option key={index} value={c._id}>
-                          {c.categoryName}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <span className="font-medium">Product brand</span>
-                    <select
-                      name="brand"
-                      value={formik.values.brand}
-                      onChange={formik.handleChange}
-                      onBlur={formik.handleBlur}
-                      className="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
-    rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
-    focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
-                    >
-                      <option value="">Select brand</option>
-                      {brandState.map((b, index) => (
-                        <option key={index} value={b._id}>
-                          {b.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
+                <div className="space-y-4">
                   <CustomerInput
-                    onChange={formik.handleChange("price")}
-                    value={formik.values.price}
+                    onChange={formik.handleChange("productName")}
+                    value={formik.values.productName}
                     type="text"
-                    label="price"
-                    defaultValue="$100.00"
+                    label="product name"
                     i_class="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
             rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
             focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
+                    placeholder="Product Name"
                   />
-                </div>
-                <div className="grid grid-cols-1 gap-4">
-                  <CustomerInput
-                    onChange={formik.handleChange("tags")}
-                    value={formik.values.tags}
-                    type="text"
-                    label="product tag"
-                    placeholder="Type and enter"
-                    i_class="w-full mb-3 pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
-            rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
-            focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
-                  />
-                </div>
+                  {formik.touched.productName && formik.errors.productName ? (
+                    <div className="text-red-500 text-sm">
+                      {formik.errors.productName}
+                    </div>
+                  ) : null}
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="flex flex-col gap-2">
+                      <span className="font-medium">Product type</span>
+                      <select
+                        name="category"
+                        value={formik.values.category}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        className="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
+    rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
+    focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
+                      >
+                        <option value="">Select category</option>
+                        {CateState.map((c, index) => (
+                          <option key={index} value={c._id}>
+                            {c.categoryName}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-                <textarea
-                  onChange={formik.handleChange("des")}
-                  value={formik.values.des}
-                  maxLength={200}
-                  className="border rounded-xl px-3 py-2 w-full min-h-50 bg-gray-100 border border-gray-300
+                    <div className="flex flex-col gap-2">
+                      <span className="font-medium">Product brand</span>
+                      <select
+                        name="brand"
+                        value={formik.values.brand}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        className="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
+    rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
+    focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
+                      >
+                        <option value="">Select brand</option>
+                        {brandState.map((b, index) => (
+                          <option key={index} value={b._id}>
+                            {b.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <CustomerInput
+                      onChange={formik.handleChange("price")}
+                      value={formik.values.price}
+                      type="text"
+                      label="price"
+                      defaultValue="$100.00"
+                      i_class="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
             rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
             focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
-                  placeholder="Description"
-                />
-                <div className="grid grid-cols-2 gap-4">
-                  <CustomerInput
-                    onChange={formik.handleChange("stock")}
-                    value={formik.values.stock}
-                    defaultValue={1}
-                    min={1}
-                    max={1000}
-                    type="number"
-                    label="stock"
-                    i_class="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
+                    />
+                  </div>
+                  <div className="grid grid-cols-1 gap-4">
+                    <CustomerInput
+                      onChange={formik.handleChange("tags")}
+                      value={formik.values.tags}
+                      type="text"
+                      label="product tag"
+                      placeholder="Type and enter"
+                      i_class="w-full mb-3 pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
             rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
             focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
+                    />
+                  </div>
+
+                  <textarea
+                    onChange={formik.handleChange("des")}
+                    value={formik.values.des}
+                    maxLength={200}
+                    className="border rounded-xl px-3 py-2 w-full min-h-50 bg-gray-100 border border-gray-300
+            rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
+            focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
+                    placeholder="Description"
                   />
+                  <div className="grid grid-cols-2 gap-4">
+                    <CustomerInput
+                      onChange={formik.handleChange("stock")}
+                      value={formik.values.stock}
+                      defaultValue={1}
+                      min={1}
+                      max={1000}
+                      type="number"
+                      label="stock"
+                      i_class="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
+            rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
+            focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
+                    />
+                  </div>
                 </div>
-              </div>
               </div>
             </div>
           </div>

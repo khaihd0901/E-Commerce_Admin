@@ -43,6 +43,13 @@ export const getProductById = createAsyncThunk('get-product', async(id,thunkAPI)
     }
 })
 
+export const deleteProductById = createAsyncThunk('delete-product', async(id,thunkAPI)=>{
+    try{
+        return await productService.deleteProductById(id)
+    }catch(err){
+        return thunkAPI.rejectWithValue(err)
+    }
+})
 const initialState = {
   product: null,
   products: [],
@@ -57,7 +64,7 @@ export const productSlice = createSlice({
     name: 'products',
     initialState,
     reducers: {
-        clearProduct: (state) => {
+    clearProduct: (state) => {
       state.product = null;
     },
     clearImages: (state) => {
@@ -142,15 +149,27 @@ export const productSlice = createSlice({
             state.isSuccess = false;
             state.product = null
         })
+        .addCase(deleteProductById.pending, (state)=>{
+            state.isLoading = true;
+        })
+        .addCase(deleteProductById.fulfilled, (state,action)=>{
+            state.isLoading = false;
+            state.isSuccess = true;
+            state.product = action.payload
+        })
+        .addCase(deleteProductById.rejected, (state)=>{
+            state.isLoading = false;
+            state.isError = true;
+            state.isSuccess = false;
+            state.product = null
+        })
     }
 })
 
-// ✅ EXPORT ACTIONS
 export const {
   clearProduct,
   clearImages,
   resetProductState
 } = productSlice.actions;
 
-// ✅ EXPORT REDUCER (DEFAULT)
 export default productSlice.reducer;

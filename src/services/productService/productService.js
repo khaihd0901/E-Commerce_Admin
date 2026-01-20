@@ -37,11 +37,23 @@ const getProductById = async(id) =>{
 }
 
 const updateProduct = async(id,data) =>{
-  console.log(id)
   const res = await api.put(`${base_url}/product/update/${id}`,data)
-  return res.data
+    if (res) {
+    toast.success("Update Product Success");
+    return res.data;
+  } else {
+    toast.error("Update Product False");
+  }
 }
 
+const deleteProductById = async(id) =>{
+  const res = await api.delete(`${base_url}/product/${id}`)
+  if(res){
+    toast.success("Delete Product Success")
+  }else{
+    toast.error('Something when wrong')
+  }
+}
 
 const productService = {
   getProducts,
@@ -49,6 +61,7 @@ const productService = {
   uploadProductImage,
   updateProduct,
   getProductById,
+  deleteProductById,
 };
 
 export default productService;

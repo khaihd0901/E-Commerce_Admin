@@ -10,7 +10,6 @@ export default function Table({ data, onDelete, onView }) {
           header: formatHeader(key),
         }))
     : [];
-
   return (
     <div className="bg-white overflow-hidden">
       <table className="w-full text-sm">
@@ -40,7 +39,7 @@ export default function Table({ data, onDelete, onView }) {
                     View
                   </button>
                   <button
-                    onClick={() => onDelete(d.id)}
+                    onClick={() => onDelete(d)}
                     className="text-gray-100 bg-red-500 px-2 py-1 rounded-xl cursor-pointer"
                   >
                     Delete

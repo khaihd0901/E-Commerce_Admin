@@ -35,9 +35,11 @@ const DetailProduct = ({ onClose, prodId }) => {
   const brandState = useSelector((state) => state.brand.brands);
   const categoryState = useSelector((state) => state.category.categories);
 
-  const { product: proState, isLoading } = useSelector(
-    (state) => state.product,
-  );
+  const {
+    product: proState,
+    isLoading,
+    isSuccess,
+  } = useSelector((state) => state.product);
   const handleImageChange = useCallback((files, removedAssetIds) => {
     setImages(files);
     setDeletedImages(removedAssetIds);
@@ -71,8 +73,6 @@ const DetailProduct = ({ onClose, prodId }) => {
       if (images?.length > 0) {
         uploadedImages = await dispatch(uploadProductImage(images)).unwrap();
       }
-
-      console.log(uploadedImages)
       dispatch(
         updateProduct({
           id: prodId,
@@ -84,9 +84,15 @@ const DetailProduct = ({ onClose, prodId }) => {
         }),
       );
     },
+
   });
-  console.log("images: ", images);
-  console.log("removed ID: ", deletedImages);
+
+useEffect(() => {
+  if (isSuccess) {
+    onClose(true);
+  }
+}, []);
+
   return (
     <Modal onClose={onClose} onSubmit={formik.handleSubmit}>
       {/* 🔥 RELATIVE WRAPPER */}

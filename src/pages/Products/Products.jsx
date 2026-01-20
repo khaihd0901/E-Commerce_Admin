@@ -2,24 +2,37 @@ import { useEffect, useState } from "react";
 import Table from "../../components/TableModal/Table";
 import AddProduct from "./AddProduct";
 import DetailProduct from "./DetailProduct";
-import { getProducts } from "../../services/productService/productSlice";
+import {
+  deleteProductById,
+  getProducts,
+  resetProductState,
+} from "../../services/productService/productSlice";
 import { useDispatch, useSelector } from "react-redux";
+import ConfirmModal from "../../components/ConfirmDialog";
 export default function Product() {
   const dispatch = useDispatch();
-  const [prodId , setProdId] = useState(null)
+  const [prodId, setProdId] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [confirmId, setConfirmId] = useState(null);
 
   const addProduct = () => {
     setShowAdd(false);
   };
 
-  // const deleteProduct = (id) => {
+  const handleDeleteClick = (e) => {
+    setConfirmId(e.id); // open confirm modal
+  };
+  console.log(confirmId)
+  const handleCloseAddProduct = (reload = true) => {
+    setShowAdd(false);
+    if (reload) {
+      dispatch(getProducts());
+    }
+  };
 
-  // };
   useEffect(() => {
     dispatch(getProducts());
-  }, []);
+  }, [dispatch]);
   const customerState = useSelector((state) => state.product.products);
   const products = [];
   for (let i = 0; i < customerState.length; i++) {
@@ -34,10 +47,18 @@ export default function Product() {
       ratingsQuantity: customerState[i].ratingsQuantity,
     });
   }
-  const handleView = (e) =>{
-    setSelectedProduct(true)
-    setProdId(e.id)
-  }
+  const handleView = (e) => {
+    dispatch(resetProductState()); // 🔥 IMPORTANT
+    setProdId(e.id);
+  };
+
+  const handleCloseDetail = (shouldReload = false) => {
+    setProdId(null);
+    if (shouldReload) {
+      dispatch(getProducts()); // 🔥 reload table data
+    }
+  };
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen rounded-xl shadow">
       <div className="flex justify-between mb-6">
@@ -52,23 +73,30 @@ export default function Product() {
 
       <Table
         data={products}
-        // onDelete={deleteProduct}
-        onView={e => handleView(e)}
+        onDelete={e => handleDeleteClick(e)}
+        onView={(e) => handleView(e)}
       />
 
       {showAdd && (
-        <AddProduct onClose={() => setShowAdd(false)} onAdd={addProduct} />
+        <AddProduct onClose={handleCloseAddProduct} onAdd={addProduct} />
       )}
 
-      {selectedProduct && (
-        <DetailProduct
-
-          prodId={prodId}
-          onClose={() => setSelectedProduct(false)}
-          // onSubmit={(data) => {
-          //   dispatch(updateProduct(data));
-          //   setOpen(false);
-          // }}
+      {prodId && <DetailProduct prodId={prodId} onClose={handleCloseDetail} />}
+      {confirmId && (
+        <ConfirmModal
+          open={true}
+          title="Delete product?"
+          message="This action cannot be undone."
+          confirmText="Delete"
+          onCancel={() => setConfirmId(null)}
+          onConfirm={() => {
+            dispatch(deleteProductById(confirmId))
+              .unwrap()
+              .then(() => {
+                dispatch(getProducts()); // 🔥 reload table
+                setConfirmId(null);
+              });
+          }}
         />
       )}
     </div>

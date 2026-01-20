@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Upload, X } from "lucide-react";
+import ConfirmDialog from "../../components/ConfirmDialog";
+import ConfirmModal from "../../components/ConfirmDialog";
 
 const UploadImage = ({ onChange, images }) => {
   const inputRef = useRef(null);
@@ -31,28 +33,25 @@ const UploadImage = ({ onChange, images }) => {
   };
 
   // ===== REMOVE IMAGE =====
-const removeConfirmed = (index) => {
-  const removed = previews[index];
-  console.log(removed)
-  if (removed?.public_id) {
-    setRemovedAssetIds((prev) =>
-      prev.includes(removed.public_id)
-        ? prev
-        : [...prev, removed.public_id]
-    );
-  }
-  setPreviews((prev) => {
-    const updated = prev.filter((_, i) => i !== index);
-
-    if (removed?.public_id === activeId || removed?.id === activeId) {
-      setActiveId(updated[0]?.public_id || updated[0]?.id || null);
+  const removeConfirmed = (index) => {
+    const removed = previews[index];
+    console.log(removed);
+    if (removed?.public_id) {
+      setRemovedAssetIds((prev) =>
+        prev.includes(removed.public_id) ? prev : [...prev, removed.public_id],
+      );
     }
-    return updated;
-  });
+    setPreviews((prev) => {
+      const updated = prev.filter((_, i) => i !== index);
 
-  setFiles((prev) => prev.filter((_, i) => i !== index));
-};
+      if (removed?.asset_id === activeId || removed?.id === activeId) {
+        setActiveId(updated[0]?.public_id || updated[0]?.id || null);
+      }
+      return updated;
+    });
 
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+  };
 
   // ===== ACTIVE IMAGE =====
   const activeImage = previews.find(
@@ -62,7 +61,6 @@ const removeConfirmed = (index) => {
   // ===== SEND FILES TO PARENT =====
   useEffect(() => {
     onChange?.(files, removedAssetIds);
-
   }, [files, removedAssetIds, onChange]);
 
   // ===== CLEANUP BLOBS =====
@@ -90,6 +88,7 @@ const removeConfirmed = (index) => {
     });
   }, [images]);
   return (
+      <>
     <div className="bg-gray-100 rounded-xl border border-gray-200 shadow-xl p-4 space-y-4">
       <h3 className="font-semibold">Product Images</h3>
 
@@ -163,46 +162,24 @@ const removeConfirmed = (index) => {
           ))}
         </div>
       )}
+    </div>
 
+    
       {/* CONFIRM DIALOG  */}
       {confirmIndex !== null && (
-        <div
-          className="fixed inset-0 bg-black/40 flex items-center justify-center z-50"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div
-            className="bg-white rounded-xl p-6 w-80 shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="font-semibold text-lg mb-2">Remove image?</h3>
-            <p className="text-sm text-gray-600 mb-4">
-              This action cannot be undone.
-            </p>
-
-            <div className="flex justify-end gap-2">
-              <button
-                type="button"
-                onClick={() => setConfirmIndex(null)}
-                className="px-4 py-2 rounded bg-gray-100"
-              >
-                Cancel
-              </button>
-
-              <button
-                type="button"
-                onClick={() => {
-                  removeConfirmed(confirmIndex);
-                  setConfirmIndex(null);
-                }}
-                className="px-4 py-2 rounded bg-red-500 text-white"
-              >
-                Remove
-              </button>
-            </div>
-          </div>
-        </div>
+        <ConfirmModal
+          open={confirmIndex !== null}
+          title="Remove image?"
+          message="This action cannot be undone."
+          confirmText="Remove"
+          onCancel={() => setConfirmIndex(null)}
+          onConfirm={() => {
+            removeConfirmed(confirmIndex);
+            setConfirmIndex(null);
+          }}
+        />
       )}
-    </div>
+    </>
   );
 };
 
