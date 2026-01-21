@@ -1,16 +1,28 @@
 import Modal from "../../components/TableModal/Modal";
 import CustomerInput from "../../components/CustomerInput";
 import {
-  createBrand,
+  getBrandById,
+  clearBrand,
+  updateBrand,
 } from "../../services/brandService/brandSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useEffect } from "react";
-import { useCallback } from "react";
 
-export default function AddBrand({ onClose }) {
+export default function BrandDetail({ brandId, onClose }) {
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(clearBrand());
+    dispatch(getBrandById(brandId));
+    return () => {
+      dispatch(clearBrand());
+    };
+  }, [dispatch, brandId]);
+
+  const Brand = useSelector((state) => state.brand.brand?.data);
+  console.log(Brand)
   const { isSuccess, isLoading } = useSelector((state) => state.brand);
 
   let validationSchema = Yup.object({
@@ -19,21 +31,24 @@ export default function AddBrand({ onClose }) {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      name:"",
+      name: Brand?.name || "",
     },
     validationSchema,
     onSubmit: async (values) => {
       dispatch(
-        createBrand(values),
+        updateBrand({
+          id: brandId,
+          data: values,
+        }),
       );
     },
   });
 
-  useCallback(() => {
+  useEffect(() => {
     if (isSuccess) {
       onClose(true);
     }
-  }, [isSuccess, onClose]);
+  }, []);
   return (
     <Modal onClose={onClose} onSubmit={formik.handleSubmit}>
       {/* 🔥 RELATIVE WRAPPER */}
@@ -86,7 +101,7 @@ export default function AddBrand({ onClose }) {
             disabled={isLoading}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg disabled:opacity-50"
           >
-            Create
+            Update
           </button>
         </div>
       </div>

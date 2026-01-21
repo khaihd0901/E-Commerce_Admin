@@ -42,7 +42,7 @@ export default function CouponDetail({ couId, onClose }) {
       discountValue: couState?.discountValue || 0,
       minPurchaseAmount: couState?.minPurchaseAmount || 0,
       maxUses: couState?.maxUses || 0,
-      expiryDate: couState?.expiryDate || "",
+      expiryDate: couState?.expiryDate|| '',
       isActive: couState?.isActive || false,
     },
     validationSchema,
@@ -53,7 +53,6 @@ export default function CouponDetail({ couId, onClose }) {
           data: values,
         }),
       );
-      console.log(isSuccess)
     },
   });
 
@@ -185,7 +184,7 @@ export default function CouponDetail({ couId, onClose }) {
             disabled={isLoading}
             className="border px-4 py-2 rounded-lg disabled:opacity-50"
           >
-            Cancel
+            Close
           </button>
 
           <button

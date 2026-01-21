@@ -22,8 +22,9 @@ export default function AddProductModal({ onClose }) {
     dispatch(getCategories());
   }, [dispatch]);
 
-  const brandState = useSelector((state) => state.brand.brands);
-  const CateState = useSelector((state) => state.category.categories);
+  const brandState = useSelector((state) => state.brand.brands?.data);
+  const cateState = useSelector((state) => state.category.categories?.data);
+  
   const { isLoading, isSuccess } = useSelector((state) => state.product);
 
   let validationSchema = Yup.object({
@@ -121,7 +122,7 @@ export default function AddProductModal({ onClose }) {
     focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
                       >
                         <option value="">Select category</option>
-                        {CateState.map((c, index) => (
+                        {cateState.map((c, index) => (
                           <option key={index} value={c._id}>
                             {c.categoryName}
                           </option>

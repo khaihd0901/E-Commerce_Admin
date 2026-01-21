@@ -26,7 +26,7 @@ const Coupons = () => {
     dispatch(getCoupons());
   }, [dispatch]);
 
-  const couponsState = useSelector((state) => state.coupon.coupons.data);
+  const couponsState = useSelector((state) => state.coupon.coupons?.data);
   const coupons = [];
   for (let i = 0; i < couponsState?.length; i++) {
     coupons.push({

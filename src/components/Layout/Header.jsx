@@ -22,7 +22,7 @@ const Header = ({ onToggleSidebar }) => {
   const handleLogOut = () =>{
     dispatch(logout());
     localStorage.clear();
-    navigate()
+    navigate('/')
   }
   return (
     <div className="bg-white/80 backdrop-blur-xl border-b border-gray-200/50 px-6 py-4 relative">

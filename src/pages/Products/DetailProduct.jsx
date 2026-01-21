@@ -32,8 +32,8 @@ const DetailProduct = ({ onClose, prodId }) => {
     };
   }, [dispatch, prodId]);
 
-  const brandState = useSelector((state) => state.brand.brands);
-  const categoryState = useSelector((state) => state.category.categories);
+  const brandState = useSelector((state) => state.brand.brands.data);
+  const categoryState = useSelector((state) => state.category.categories.data);
 
   const {
     product: proState,

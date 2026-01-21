@@ -5,7 +5,7 @@ import { createCoupon } from "../../services/couponService/couponSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback } from "react";
 
 const AddCoupon = ({ onClose }) => {
   const dispatch = useDispatch();

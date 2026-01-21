@@ -1,17 +1,29 @@
 import Modal from "../../components/TableModal/Modal";
 import CustomerInput from "../../components/CustomerInput";
 import {
-  createBrand,
-} from "../../services/brandService/brandSlice";
+  getCategoryById,
+  clearCategory,
+  updateCategory,
+} from "../../services/categoryService/categorySlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useEffect } from "react";
-import { useCallback } from "react";
 
-export default function AddBrand({ onClose }) {
+export default function CategoryDetail({ categoryId, onClose }) {
   const dispatch = useDispatch();
-  const { isSuccess, isLoading } = useSelector((state) => state.brand);
+
+  useEffect(() => {
+    dispatch(clearCategory());
+    dispatch(getCategoryById(categoryId));
+    return () => {
+      dispatch(clearCategory());
+    };
+  }, [dispatch, categoryId]);
+
+  const Category = useSelector((state) => state.category.category?.data);
+  console.log(Category)
+  const { isSuccess, isLoading } = useSelector((state) => state.category);
 
   let validationSchema = Yup.object({
     name: Yup.string().required("Name is required"),
@@ -19,21 +31,24 @@ export default function AddBrand({ onClose }) {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      name:"",
+      name: Category?.categoryName || "",
     },
     validationSchema,
     onSubmit: async (values) => {
       dispatch(
-        createBrand(values),
+        updateCategory({
+          id: categoryId,
+          data: values,
+        }),
       );
     },
   });
 
-  useCallback(() => {
+  useEffect(() => {
     if (isSuccess) {
       onClose(true);
     }
-  }, [isSuccess, onClose]);
+  }, []);
   return (
     <Modal onClose={onClose} onSubmit={formik.handleSubmit}>
       {/* 🔥 RELATIVE WRAPPER */}
@@ -52,11 +67,11 @@ export default function AddBrand({ onClose }) {
                       onChange={formik.handleChange("name")}
                       value={formik.values.name}
                       type="text"
-                      label="brand name"
+                      label="category name"
                       i_class="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
             rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
             focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
-                      placeholder="Brand Name"
+                      placeholder="category Name"
                     />
                     {formik.touched.name && formik.errors.name && (
                       <div className="text-red-500 text-sm">
@@ -78,7 +93,7 @@ export default function AddBrand({ onClose }) {
             disabled={isLoading}
             className="border px-4 py-2 rounded-lg disabled:opacity-50"
           >
-            Cancel
+            Close
           </button>
 
           <button
@@ -86,7 +101,7 @@ export default function AddBrand({ onClose }) {
             disabled={isLoading}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg disabled:opacity-50"
           >
-            Create
+            Update
           </button>
         </div>
       </div>
