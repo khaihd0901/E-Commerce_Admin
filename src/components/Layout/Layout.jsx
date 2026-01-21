@@ -5,7 +5,7 @@ import { useState } from "react";
 
 const Layout = () => {
   const [sideBarCollapsed, setSideBarCollapsed] = useState(false);
-  const [currentPage, setCurrentPage] = useState("dashboard");
+  const [currentPage, setCurrentPage] = useState();
   return (
     <div className="flex min-h-screen bg-gray-200 min-w-screen transition-all duration-500">
       <div className="flex h-screen overflow-hidden w-full">

@@ -22,8 +22,9 @@ export default function Product() {
   const handleDeleteClick = (e) => {
     setConfirmId(e.id); // open confirm modal
   };
-  console.log(confirmId)
+
   const handleCloseAddProduct = (reload = true) => {
+    console.log(reload)
     setShowAdd(false);
     if (reload) {
       dispatch(getProducts());

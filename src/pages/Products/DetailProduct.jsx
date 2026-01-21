@@ -40,6 +40,7 @@ const DetailProduct = ({ onClose, prodId }) => {
     isLoading,
     isSuccess,
   } = useSelector((state) => state.product);
+  console.log("isSuccess", isSuccess)
   const handleImageChange = useCallback((files, removedAssetIds) => {
     setImages(files);
     setDeletedImages(removedAssetIds);
@@ -84,30 +85,20 @@ const DetailProduct = ({ onClose, prodId }) => {
         }),
       );
     },
-
   });
 
-useEffect(() => {
-  if (isSuccess) {
-    onClose(true);
-  }
-}, []);
+  useEffect(() => {
+    if (isSuccess) {
+      onClose(true);
+    }
+  }, []);
 
   return (
     <Modal onClose={onClose} onSubmit={formik.handleSubmit}>
       {/* 🔥 RELATIVE WRAPPER */}
       <div className="relative">
         {/* 🔥 LOADING OVERLAY */}
-        {isLoading && (
-          <div className="absolute inset-0 bg-white/70 z-50 flex items-center justify-center rounded-xl">
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
-              <p className="text-sm text-gray-600 font-medium">
-                Loading product...
-              </p>
-            </div>
-          </div>
-        )}
+
         <h2 className="text-lg font-semibold mb-4">Product Detail</h2>
 
         <div className="p-4 bg-gray-100 min-w-5xl">
@@ -295,6 +286,16 @@ useEffect(() => {
           </button>
         </div>
       </div>
+      {isLoading && (
+        <div className="absolute inset-0 bg-white/70 z-50 flex items-center justify-center rounded-xl">
+          <div className="flex flex-col items-center gap-3">
+            <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
+            <p className="text-sm text-gray-600 font-medium">
+              Loading product...
+            </p>
+          </div>
+        </div>
+      )}
     </Modal>
   );
 };

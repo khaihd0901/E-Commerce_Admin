@@ -2,14 +2,7 @@ import { BarChart3, Database, LayoutDashboard, MessageCircleCode, MessageCircleI
 
 const menuItems = [
   {
-    id: "dashboard",
-    icon: LayoutDashboard,
-    label: "Dashboard",
-    active: true,
-    badge: "New",
-  },
-  {
-    id: "Catalog",
+    id: "catalog",
     icon: Database,
     label: "Catalog",
     submenu: [

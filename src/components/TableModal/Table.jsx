@@ -11,7 +11,7 @@ export default function Table({ data, onDelete, onView }) {
         }))
     : [];
   return (
-    <div className="bg-white overflow-hidden">
+    <div className="bg-white overflow-clip">
       <table className="w-full text-sm">
         <thead className="bg-gray-200">
           <tr>

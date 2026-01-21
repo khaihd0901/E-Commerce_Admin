@@ -44,7 +44,7 @@ const UploadImage = ({ onChange, images }) => {
     setPreviews((prev) => {
       const updated = prev.filter((_, i) => i !== index);
 
-      if (removed?.asset_id === activeId || removed?.id === activeId) {
+      if (removed?.public_id === activeId || removed?.id === activeId) {
         setActiveId(updated[0]?.public_id || updated[0]?.id || null);
       }
       return updated;

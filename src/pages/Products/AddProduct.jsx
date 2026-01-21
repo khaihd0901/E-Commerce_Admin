@@ -66,6 +66,7 @@ export default function AddProductModal({ onClose }) {
       onClose(true);
     }
   }, [isSuccess,onClose]);
+  
   const handleImagesChange = (files) => {
     if (!files || files.length === 0) return;
     setImages(files);
@@ -76,17 +77,6 @@ export default function AddProductModal({ onClose }) {
       {/* 🔥 RELATIVE WRAPPER */}
       <div className="relative">
         {/* 🔥 LOADING OVERLAY */}
-        {isLoading && (
-          <div className="absolute inset-0 z-50 bg-white/70 flex items-center justify-center rounded-xl">
-            <div className="flex flex-col items-center gap-3">
-              <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
-              <p className="text-sm text-gray-600 font-medium">
-                Creating product...
-              </p>
-            </div>
-          </div>
-        )}
-
         {/* FORM */}
         <div className="p-4 bg-gray-100 min-w-5xl">
           <div className="grid grid-cols-12 gap-4">
@@ -231,7 +221,19 @@ export default function AddProductModal({ onClose }) {
             Add
           </button>
         </div>
+
       </div>
+      
+                {isLoading && (
+          <div className="absolute inset-0 z-50 bg-white/70 flex items-center justify-center rounded-xl">
+            <div className="flex flex-col items-center gap-3">
+              <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+              <p className="text-sm text-gray-600 font-medium">
+                Creating product...
+              </p>
+            </div>
+          </div>
+        )}
     </Modal>
   );
 }

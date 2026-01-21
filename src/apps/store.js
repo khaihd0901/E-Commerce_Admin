@@ -9,12 +9,12 @@ import orderReducer from '../services/OrderService/orderSlice'
 
 export const store = configureStore({
   reducer: { 
-    auth: authReducer, 
     user: userReducer,
     product: productReducer,
     brand: brandReducer,
     category: categoryReducer,
     coupon: couponReducer,
     order: orderReducer,
+    auth: authReducer, 
   },
 });

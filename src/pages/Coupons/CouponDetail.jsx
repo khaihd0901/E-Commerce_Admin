@@ -1,17 +1,31 @@
-import React from "react";
 import Modal from "../../components/TableModal/Modal";
 import CustomerInput from "../../components/CustomerInput";
-import { createCoupon } from "../../services/couponService/couponSlice";
+import {
+  getCouponById,
+  clearCoupon,
+  updateCoupon,
+} from "../../services/couponService/couponSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect } from "react";
 
-const AddCoupon = ({ onClose }) => {
+export default function CouponDetail({ couId, onClose }) {
   const dispatch = useDispatch();
-  const { isLoading, isSuccess } = useSelector((state) => state.coupon);
 
-  const validationSchema = Yup.object({
+  useEffect(() => {
+    dispatch(clearCoupon());
+    dispatch(getCouponById(couId));
+    return () => {
+      dispatch(clearCoupon());
+    };
+  }, [dispatch, couId]);
+
+  const couState = useSelector((state) => state.coupon.coupon?.data);
+  const { isSuccess, isLoading } = useSelector((state) => state.coupon);
+
+  console.log("issucess", isSuccess);
+  let validationSchema = Yup.object({
     code: Yup.string().required("Code Name is required"),
     des: Yup.string().required("Description is required"),
     discountValue: Yup.number().min(1).required(),
@@ -20,28 +34,34 @@ const AddCoupon = ({ onClose }) => {
     expiryDate: Yup.date().required("Expiry date is required"),
     isActive: Yup.boolean(),
   });
-
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
-      code: "",
-      des: "",
-      discountValue: 0,
-      minPurchaseAmount: 0,
-      maxUses: 0,
-      expiryDate: "",
-      isActive: true,
+      code: couState?.code || "",
+      des: couState?.des || "",
+      discountValue: couState?.discountValue || 0,
+      minPurchaseAmount: couState?.minPurchaseAmount || 0,
+      maxUses: couState?.maxUses || 0,
+      expiryDate: couState?.expiryDate || "",
+      isActive: couState?.isActive || false,
     },
     validationSchema,
-    onSubmit: (values) => {
-      dispatch(createCoupon(values));
+    onSubmit: async (values) => {
+      dispatch(
+        updateCoupon({
+          id: couId,
+          data: values,
+        }),
+      );
+      console.log(isSuccess)
     },
   });
 
-  useCallback(() => {
-    if (isSuccess) {
+  useEffect(()=>{
+    if(isSuccess){
       onClose(true);
     }
-  }, [isSuccess, onClose]);
+  },[])
   return (
     <Modal onClose={onClose} onSubmit={formik.handleSubmit}>
       {/* 🔥 RELATIVE WRAPPER */}
@@ -173,7 +193,7 @@ const AddCoupon = ({ onClose }) => {
             disabled={isLoading}
             className="bg-blue-600 text-white px-4 py-2 rounded-lg disabled:opacity-50"
           >
-            Add
+            Update
           </button>
         </div>
       </div>
@@ -190,6 +210,4 @@ const AddCoupon = ({ onClose }) => {
       )}
     </Modal>
   );
-};
-
-export default AddCoupon;
+}

@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { ChevronDown, Store } from "lucide-react";
+import { ChevronDown, LayoutDashboard, Store } from "lucide-react";
 import menuItems from "../../libs/menuItems.js";
 import { Link } from "react-router";
 const Sidebar = ({ collapsed, currentPage, onPageChange }) => {
-  const [expandedItems, setExpandedItems] = useState(new Set(["analytics"]));
+  const [expandedItems, setExpandedItems] = useState(new Set(["catalog"]));
 
   const toggleHandle = (itemId) => {
     const newExpanded = new Set(expandedItems);
@@ -23,8 +23,8 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }) => {
       {/*Logo*/}
       <div className="py-6 px-6 border-b border-gray-200 transition-all duration-200 ">
         <div className="flex items-center space-x-3 ">
-          <Link 
-          to='/'
+          <Link
+            to="/admin"
             className={`w-10 h-10 rounded-xl flex items-center justify-center bg-[var(--color-fdaa3d)] cursor-pointer shadow-lg`}
           >
             <Store className={`w-5 h-5 text-white`} />
@@ -42,6 +42,13 @@ const Sidebar = ({ collapsed, currentPage, onPageChange }) => {
 
       {/*Navigation*/}
       <nav className="flex-1 p-4 space-y-2 overflow-hidden">
+        <Link to={'/admin'}
+        onClick={() => onPageChange("admin")}
+          className={`w-full flex items-center gap-4 p-3 rounded-xl transition-all duration-200 bg-[var(--color-febd69)] text-white shadow-lg shadow-gray-500/25}`}
+        >
+          <LayoutDashboard />
+          Dash Board
+        </Link>
         {menuItems.map((item) => (
           <div key={item.id} className="cursor-pointer">
             <div

@@ -74,6 +74,7 @@ export const productSlice = createSlice({
       state.isLoading = false;
       state.isError = false;
       state.isSuccess = false;
+      state.product = null
       state.message = '';
     }
     },
