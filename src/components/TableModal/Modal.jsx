@@ -3,7 +3,7 @@ export default function Modal({ children, onClose, onSubmit }) {
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <form
         onSubmit={onSubmit}
-        className="bg-gray-100 rounded-xl p-6 relative min-w-5xl"
+        className="bg-gray-100 rounded-xl p-6 relative min-w-7xl"
       >
         <button
           type="button"

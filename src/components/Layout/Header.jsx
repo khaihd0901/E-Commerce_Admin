@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Bell,
   ChevronDown,
@@ -10,20 +10,35 @@ import {
   Settings,
   User,
 } from "lucide-react";
-import { logout } from "../../services/authService/authSlice";
 import { useNavigate } from "react-router";
-import { useDispatch } from "react-redux";
+import { useAuthStore } from "../../stores/authStore";
 
 const Header = ({ onToggleSidebar }) => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const [open, setOpen] = useState(false);
 
-  const handleLogOut = () =>{
-    dispatch(logout());
-    localStorage.clear();
-    navigate('/')
-  }
+  const { accessToken, user, authRefreshToken, authMe, authSignOut } =
+    useAuthStore();
+  const init = async () => {
+    if (!accessToken) {
+      await authRefreshToken();
+    }
+    if (accessToken && !user) {
+      await authMe();
+    }
+  };
+
+  useEffect(() => {
+    init();
+  }, []);
+  const handleLogOut = async () => {
+    try {
+      await authSignOut();
+      navigate("/login");
+    } catch (err) {
+      console.log(err);
+    }
+  };
   return (
     <div className="bg-white/80 backdrop-blur-xl border-b border-gray-200/50 px-6 py-4 relative">
       <div className="flex items-center justify-between">
@@ -96,11 +111,11 @@ const Header = ({ onToggleSidebar }) => {
 
       {/* Dropdown */}
       {open && (
-        <div className="absolute right-1 mt-4 w-64 bg-white rounded-xl shadow-lg z-auto">
+        <div className="absolute right-1 mt-4 w-64 bg-white rounded-xl shadow-lg z-50">
           {/* Header */}
           <div className="px-4 py-3">
-            <p className="font-semibold text-sm">Musharof Chowdhury</p>
-            <p className="text-xs text-gray-500">randomuser@pimjo.com</p>
+            <p className="font-semibold text-sm">{user.username}</p>
+            <p className="text-xs text-gray-500">{user.email}</p>
           </div>
 
           {/* Menu */}
@@ -114,9 +129,7 @@ const Header = ({ onToggleSidebar }) => {
           </div>
 
           {/* Footer */}
-          <div
-          onClick={handleLogOut}
-           className="border-t border-gray-300 py-2">
+          <div onClick={handleLogOut} className="border-t border-gray-300 py-2">
             <DropdownItem icon={<LogOut size={16} />} text="Sign out" danger />
           </div>
         </div>

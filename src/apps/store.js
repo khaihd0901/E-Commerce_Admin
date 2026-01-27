@@ -1,5 +1,4 @@
 import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "../services/authService/authSlice";
 import userReducer from "../services/uerService/userSlice";
 import  productReducer from "../services/productService/productSlice";
 import  brandReducer from "../services/brandService/brandSlice";
@@ -15,6 +14,5 @@ export const store = configureStore({
     category: categoryReducer,
     coupon: couponReducer,
     order: orderReducer,
-    auth: authReducer, 
   },
 });

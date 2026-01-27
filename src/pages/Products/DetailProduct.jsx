@@ -1,10 +1,7 @@
 import Modal from "../../components/TableModal/Modal";
 import CustomerInput from "../../components/CustomerInput";
 import {
-  uploadProductImage,
-  getProductById,
   clearProduct,
-  updateProduct,
 } from "../../services/productService/productSlice";
 import { getCategories } from "../../services/categoryService/categorySlice";
 import { getBrands } from "../../services/brandService/brandSlice";
@@ -14,76 +11,88 @@ import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useCallback, useEffect, useState } from "react";
 import UploadImage from "./UploadImage";
+import { useProductStore } from "../../stores/productStore";
 
 const DetailProduct = ({ onClose, prodId }) => {
   const [images, setImages] = useState();
   const [deletedImages, setDeletedImages] = useState();
 
+  const {productGetById, product, productUploadImages,productUpdate, isSuccess, isLoading} = useProductStore();
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(getBrands());
     dispatch(getCategories());
     dispatch(clearProduct());
-    dispatch(getProductById(prodId));
 
     return () => {
       dispatch(clearProduct());
     };
   }, [dispatch, prodId]);
 
+  useEffect(() =>{
+    productGetById(prodId)
+  },[])
   const brandState = useSelector((state) => state.brand.brands.data);
-  const categoryState = useSelector((state) => state.category.categories.data);
+  const cateState = useSelector((state) => state.category.categories.data);
 
-  const {
-    product: proState,
-    isLoading,
-    isSuccess,
-  } = useSelector((state) => state.product);
-  console.log("isSuccess", isSuccess)
   const handleImageChange = useCallback((files, removedAssetIds) => {
     setImages(files);
     setDeletedImages(removedAssetIds);
   }, []);
 
   let validationSchema = Yup.object({
-    productName: Yup.string().required("Email is required"),
+    title: Yup.string().required("Product name is required"),
     category: Yup.string().required("Category is required"),
     brand: Yup.string().required("Brand is required"),
-    price: Yup.string().required("Price is required"),
-    tags: Yup.array().required("Tags are required"),
-    des: Yup.string().required("Password is required"),
-    stock: Yup.string().required("Stock is required"),
+    price: Yup.number().required("Price is required"),
+    unit: Yup.string().required("Unit is required"),
+    weight: Yup.number().required("Weight is required"),
+    stock: Yup.number().required("Stock is required"),
+    tags: Yup.array().required("tags is required"),
+    des: Yup.string().required("des is required"),
+    // harvestDate: Yup.date().required("Harvest Date date is required"),
+    // expiryDate: Yup.date().required("Expiry date is required"),
+    origin: Yup.string().required("origin is required"),
+    farmName: Yup.string().required("farmName is required"),
+    storage: Yup.string().required("storage is required"),
   });
-
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      productName: proState?.productName || "",
-      category: proState?.category || "",
-      brand: proState?.brand || "",
-      price: proState?.price || "",
-      tags: proState?.tags || [],
-      des: proState?.des || "",
-      stock: proState?.stock || "",
+      title: product?.title || "",
+      category: product?.category || "",
+      brand: product?.brand || "",
+      price: product?.price || "",
+      discount: product?.discount || 0,
+      unit: product?.unit || "",
+      weight: product?.weight || 0,
+      stock: product?.stock || 0,
+      tags: product?.tags || [],
+      des: product?.des || "",
+      // harvestDate: product.harvestDate || "",
+      // expiryDate: product.expiryDate || "",
+      origin: product?.origin || "",
+      farmName: product?.farmName || "",
+      isOrganic: product?.isOrganic || false,
+      storage: product?.storage || "",
     },
     validationSchema,
     onSubmit: async (values) => {
       let uploadedImages = [];
 
       if (images?.length > 0) {
-        uploadedImages = await dispatch(uploadProductImage(images)).unwrap();
+        uploadedImages = await productUploadImages(images);
       }
-      dispatch(
-        updateProduct({
+      console.log("uploadedImages", uploadedImages)
+      await productUpdate({
           id: prodId,
           data: {
             ...values,
             newImages: uploadedImages,
             removedImages: deletedImages,
           },
-        }),
-      );
+        })
     },
   });
 
@@ -108,7 +117,7 @@ const DetailProduct = ({ onClose, prodId }) => {
               <div className="w-full h-56">
                 <UploadImage
                   onChange={handleImageChange}
-                  images={proState?.images}
+                  images={product?.images}
                   isLoading={isLoading}
                 />
               </div>
@@ -119,12 +128,10 @@ const DetailProduct = ({ onClose, prodId }) => {
               <div className="bg-gray-100 rounded-xl border border-gray-200 shadow-xl p-4">
                 <h3 className="font-semibold mb-4">General Information</h3>
 
-                {/* GENERAL INFORMATION */}
-
                 <div className="space-y-4">
                   <CustomerInput
-                    onChange={formik.handleChange("productName")}
-                    value={formik.values.productName}
+                    onChange={formik.handleChange("title")}
+                    value={formik.values.title}
                     type="text"
                     label="product name"
                     i_class="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
@@ -132,15 +139,33 @@ const DetailProduct = ({ onClose, prodId }) => {
             focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
                     placeholder="Product Name"
                   />
-                  {formik.touched.productName && formik.errors.productName ? (
+                  {formik.touched.title && formik.errors.title ? (
                     <div className="text-red-500 text-sm">
-                      {formik.errors.productName}
+                      {formik.errors.title}
                     </div>
                   ) : null}
+                  <div className="grid grid-cols-1 gap-4">
+                    <CustomerInput
+                      onChange={formik.handleChange("tags")}
+                      value={formik.values.tags}
+                      type="text"
+                      label="product tag"
+                      placeholder="Type and enter"
+                      i_class="w-full mb-3 pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
+            rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
+            focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
+                    />
+
+                    {formik.touched.tags && formik.errors.tags ? (
+                      <div className="text-red-500 text-sm">
+                        {formik.errors.tags}
+                      </div>
+                    ) : null}
+                  </div>
                   <div className="grid grid-cols-3 gap-4">
                     <div className="flex flex-col gap-2">
                       <span className="font-medium">Product type</span>
-                      <select
+<select
                         name="category"
                         value={formik.values.category}
                         onChange={formik.handleChange}
@@ -150,18 +175,19 @@ const DetailProduct = ({ onClose, prodId }) => {
     focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
                       >
                         <option value="">Select category</option>
-                        {categoryState?.map((c, index) => (
+                        {cateState?.map((c, index) => (
                           <option key={index} value={c._id}>
                             {c.categoryName}
                           </option>
                         ))}
                       </select>
+                      {formik.touched.category && formik.errors.category ? (
+                        <div className="text-red-500 text-sm">
+                          {formik.errors.category}
+                        </div>
+                      ) : null}
                     </div>
-                    {formik.touched.category && formik.errors.category ? (
-                      <div className="text-red-500 text-sm">
-                        {formik.errors.category}
-                      </div>
-                    ) : null}
+
                     <div className="flex flex-col gap-2">
                       <span className="font-medium">Product brand</span>
                       <select
@@ -180,87 +206,214 @@ const DetailProduct = ({ onClose, prodId }) => {
                           </option>
                         ))}
                       </select>
+                      {formik.touched.brand && formik.errors.brand ? (
+                        <div className="text-red-500 text-sm">
+                          {formik.errors.brand}
+                        </div>
+                      ) : null}
                     </div>
-                    {formik.touched.brand && formik.errors.brand ? (
-                      <div className="text-red-500 text-sm">
-                        {formik.errors.brand}
-                      </div>
-                    ) : null}
-                    <CustomerInput
-                      onChange={formik.handleChange("price")}
-                      value={formik.values.price}
-                      type="text"
-                      label="price"
-                      defaultValue="$100.00"
-                      i_class="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
+                    <div className="flex flex-col gap-2">
+                      <CustomerInput
+                        onChange={formik.handleChange("price")}
+                        value={formik.values.price}
+                        type="text"
+                        label="price"
+                        defaultValue="$100.00"
+                        i_class="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
             rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
             focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
-                    />
-                    {formik.touched.price && formik.errors.price ? (
-                      <div className="text-red-500 text-sm">
-                        {formik.errors.price}
-                      </div>
-                    ) : null}
+                      />
+                      {formik.touched.price && formik.errors.price ? (
+                        <div className="text-red-500 text-sm">
+                          {formik.errors.price}
+                        </div>
+                      ) : null}
+                    </div>
                   </div>
-                  <div className="grid grid-cols-1 gap-4">
-                    <CustomerInput
-                      onChange={formik.handleChange("tags")}
-                      value={formik.values.tags}
-                      type="text"
-                      label="product tag"
-                      placeholder="Type and enter"
-                      i_class="w-full mb-3 pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
+                  {/* EXTRA */}
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="flex flex-col-gap-2">
+                      <CustomerInput
+                        label="Origin"
+                        value={formik.values.origin}
+                        onChange={formik.handleChange("origin")}
+                        i_class="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
             rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
             focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
-                    />
-                    {formik.touched.tags && formik.errors.tags ? (
-                      <div className="text-red-500 text-sm">
-                        {formik.errors.tags}
-                      </div>
-                    ) : null}
+                      />
+                      {formik.touched.origin && formik.errors.origin ? (
+                        <div className="text-red-500 text-sm">
+                          {formik.errors.origin}
+                        </div>
+                      ) : null}
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <CustomerInput
+                        label="Farm name"
+                        value={formik.values.farmName}
+                        onChange={formik.handleChange("farmName")}
+                        i_class="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
+            rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
+            focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
+                      />
+                      {formik.touched.farmName && formik.errors.farmName ? (
+                        <div className="text-red-500 text-sm">
+                          {formik.errors.farmName}
+                        </div>
+                      ) : null}
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      <label className="flex gap-2 items-center select-none">
+                        <input
+                          type="checkbox"
+                          checked={formik.values.isOrganic}
+                          onChange={() =>
+                            formik.setFieldValue(
+                              "isOrganic",
+                              !formik.values.isOrganic,
+                            )
+                          }
+                        />
+                        Organic product
+                      </label>
+                    </div>
                   </div>
 
-                  <textarea
-                    onChange={formik.handleChange("des")}
-                    value={formik.values.des}
-                    maxLength={200}
-                    className="border rounded-xl px-3 py-2 w-full min-h-50 bg-gray-100 border border-gray-300
-            rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
-            focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
-                    placeholder="Description"
-                  />
-                  {formik.touched.des && formik.errors.des ? (
-                    <div className="text-red-500 text-sm">
-                      {formik.errors.des}
+                  {/* VEGETABLE INFO */}
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="flex flex-col gap-2">
+                      <span className="font-medium">Product Unit</span>
+                      <select
+                        name="unit"
+                        value={formik.values.unit}
+                        onChange={formik.handleChange}
+                        onBlur={formik.handleBlur}
+                        className="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
+    rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
+    focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
+                      >
+                        <option value="kg">Kg</option>
+                        <option value="g">Gram</option>
+                        <option value="bundle">Bundle</option>
+                        <option value="piece">Piece</option>
+                      </select>
+                      {formik.touched.unit && formik.errors.unit ? (
+                        <div className="text-red-500 text-sm">
+                          {formik.errors.unit}
+                        </div>
+                      ) : null}
                     </div>
-                  ) : null}
+                    <div className="flex flex-col gap-2">
+                      <CustomerInput
+                        type="number"
+                        label="Weight"
+                        value={formik.values.weight}
+                        i_class="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
+            rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
+            focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
+                        onChange={formik.handleChange("weight")}
+                      />
+                      {formik.touched.weight && formik.errors.weight ? (
+                        <div className="text-red-500 text-sm">
+                          {formik.errors.weight}
+                        </div>
+                      ) : null}
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <CustomerInput
+                        onChange={formik.handleChange("stock")}
+                        value={formik.values.stock}
+                        defaultValue={1}
+                        min={1}
+                        max={1000}
+                        type="number"
+                        label="stock"
+                        i_class="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
+            rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
+            focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
+                      />
+                      {formik.touched.stock && formik.errors.stock ? (
+                        <div className="text-red-500 text-sm">
+                          {formik.errors.stock}
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  {/* DATES */}
+                  {/* <div className="grid grid-cols-2 gap-4">
+                    <div className="flex flex-col gap-2">
+                      <CustomerInput
+                        i_class="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
+            rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
+            focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
+                        type="date"
+                        label="Harvest date"
+                        value={formik.values.harvestDate}
+                        onChange={formik.handleChange("harvestDate")}
+                      />
+                      {formik.touched.harvestDate &&
+                      formik.errors.harvestDate ? (
+                        <div className="text-red-500 text-sm">
+                          {formik.errors.harvestDate}
+                        </div>
+                      ) : null}
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <CustomerInput
+                        i_class="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
+            rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
+            focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
+                        type="date"
+                        label="Expiry date"
+                        value={formik.values.expiryDate}
+                        onChange={formik.handleChange("expiryDate")}
+                      />
+
+                      {formik.touched.expiryDate && formik.errors.expiryDate ? (
+                        <div className="text-red-500 text-sm">
+                          {formik.errors.expiryDate}
+                        </div>
+                      ) : null}
+                    </div>
+                  </div> */}
                   <div className="grid grid-cols-2 gap-4">
-                    {/* <CustomerInput
-                                                                          onChange={formik.handleChange("ex")}
-                    value={formik.values.ex}
-                    type="date"
-                    label="expiration date"
-                    i_class="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
+                    <div className="flex flex-col gap-2">
+                      <textarea
+                        onChange={formik.handleChange("des")}
+                        value={formik.values.des}
+                        maxLength={200}
+                        className="border rounded-xl px-3 py-2 w-full min-h-20 bg-gray-100 border border-gray-300
             rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
             focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
-                  /> */}
-                    <CustomerInput
-                      onChange={formik.handleChange("stock")}
-                      value={formik.values.stock}
-                      defaultValue={1}
-                      min={1}
-                      max={1000}
-                      type="number"
-                      label="stock"
-                      i_class="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
+                        placeholder="Description"
+                      />
+
+                      {formik.touched.des && formik.errors.des ? (
+                        <div className="text-red-500 text-sm">
+                          {formik.errors.des}
+                        </div>
+                      ) : null}
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <textarea
+                        placeholder="Storage instructions"
+                        onChange={formik.handleChange("storage")}
+                        value={formik.values.storage}
+                        className="border rounded-xl px-3 py-2 w-full min-h-20 bg-gray-100 border border-gray-300
             rounded-xl text-gray-800 placeholder-gray-500 focus:outline-none 
             focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
-                    />
-                    {formik.touched.stock && formik.errors.stock ? (
-                      <div className="text-red-500 text-sm">
-                        {formik.errors.stock}
-                      </div>
-                    ) : null}
+                      />
+
+                      {formik.touched.storage && formik.errors.storage ? (
+                        <div className="text-red-500 text-sm">
+                          {formik.errors.storage}
+                        </div>
+                      ) : null}
+                    </div>
                   </div>
                 </div>
               </div>

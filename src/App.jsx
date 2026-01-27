@@ -10,7 +10,7 @@ import Brands from "./pages/Brands/Brands";
 import Coupons from "./pages/Coupons/Coupons";
 import Users from "./pages/Users/Users";
 import { Toaster } from "sonner";
-
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
@@ -19,25 +19,21 @@ function App() {
       <BrowserRouter>
         <Routes>
           {/* Public routes */}
-          <Route path="/" element={<Login />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
 
           {/*Protected admin routes */}
-          <Route
-            path="/admin"
-            element={
-                <Layout />
-            }
-          >
-            <Route index element={<DashBoard />} />
-            <Route path="products" element={<Products />} />
-            <Route path="categories" element={<Categories />} />
-            <Route path="brands" element={<Brands />} />
-            <Route path="coupons" element={<Coupons />} />
-            <Route path="order-list" element={<Orders />} />
-            <Route path="all-users" element={<Users />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/admin" element={<Layout />}>
+              <Route index element={<DashBoard />} />
+              <Route path="products" element={<Products />} />
+              <Route path="categories" element={<Categories />} />
+              <Route path="brands" element={<Brands />} />
+              <Route path="coupons" element={<Coupons />} />
+              <Route path="order-list" element={<Orders />} />
+              <Route path="all-users" element={<Users />} />
+            </Route>
           </Route>
-
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

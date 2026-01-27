@@ -2,19 +2,16 @@ import { useEffect, useState } from "react";
 import Table from "../../components/TableModal/Table";
 import AddProduct from "./AddProduct";
 import DetailProduct from "./DetailProduct";
-import {
-  deleteProductById,
-  getProducts,
-  resetProductState,
-} from "../../services/productService/productSlice";
-import { useDispatch, useSelector } from "react-redux";
 import ConfirmModal from "../../components/ConfirmDialog";
+import { useProductStore } from "../../stores/productStore";
 export default function Product() {
-  const dispatch = useDispatch();
+  const { productGetAll, clearState, productDeleteById, isLoading } =
+    useProductStore();
+  const data = useProductStore((s) => s.products);
+
   const [prodId, setProdId] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
   const [confirmId, setConfirmId] = useState(null);
-
   const addProduct = () => {
     setShowAdd(false);
   };
@@ -23,43 +20,40 @@ export default function Product() {
     setConfirmId(e.id); // open confirm modal
   };
 
-  const handleCloseAddProduct = (reload = true) => {
-    console.log(reload)
+  const handleCloseAddProduct = async (reload = true) => {
     setShowAdd(false);
     if (reload) {
-      dispatch(getProducts());
+      await productGetAll();
     }
   };
 
   useEffect(() => {
-    dispatch(getProducts());
-  }, [dispatch]);
-  const customerState = useSelector((state) => state.product.products);
-  const products = [];
-  for (let i = 0; i < customerState.length; i++) {
-    products.push({
-      key: i + 1,
-      id: customerState[i]._id,
-      name: customerState[i].productName,
-      category: customerState[i].category?.categoryName,
-      brand: customerState[i].brand?.name,
-      stock: customerState[i].stock,
-      price: customerState[i].price,
-      ratingsQuantity: customerState[i].ratingsQuantity,
-    });
-  }
-  const handleView = (e) => {
-    dispatch(resetProductState()); // 🔥 IMPORTANT
+    productGetAll();
+  }, []);
+
+  const products = data.map((item, index) => ({
+    key: index + 1,
+    id: item._id,
+    name: item.title,
+    category: item.category?.categoryName || "-",
+    brand: item.brand?.name || "-",
+    stock: item.stock,
+    price: item.price,
+    ratingsQuantity: item.ratingsQuantity,
+  }));
+
+  const handleView =  (e) => {
+     clearState();
     setProdId(e.id);
   };
 
-  const handleCloseDetail = (shouldReload = false) => {
+  const handleCloseDetail = async (shouldReload = false) => {
+     clearState();
     setProdId(null);
     if (shouldReload) {
-      dispatch(getProducts()); // 🔥 reload table data
+      await productGetAll(); // reload table data
     }
   };
-
   return (
     <div className="p-6 bg-gray-50 min-h-screen rounded-xl shadow">
       <div className="flex justify-between mb-6">
@@ -74,7 +68,7 @@ export default function Product() {
 
       <Table
         data={products}
-        onDelete={e => handleDeleteClick(e)}
+        onDelete={(e) => handleDeleteClick(e)}
         onView={(e) => handleView(e)}
       />
 
@@ -88,13 +82,16 @@ export default function Product() {
           open={true}
           title="Delete product?"
           message="This action cannot be undone."
-          confirmText="Delete"
+          confirmText={isLoading ? "Deleting..." : "Delete"}
+          disabled={isLoading}
           onCancel={() => setConfirmId(null)}
           onConfirm={() => {
-            dispatch(deleteProductById(confirmId))
-              .unwrap()
+            productDeleteById(confirmId)
               .then(() => {
-                dispatch(getProducts()); // 🔥 reload table
+                productGetAll();
+                setConfirmId(null);
+              })
+              .catch(() => {
                 setConfirmId(null);
               });
           }}
