@@ -1,29 +1,17 @@
 import Modal from "../../components/TableModal/Modal";
 import CustomerInput from "../../components/CustomerInput";
-import {
-  getBrandById,
-  clearBrand,
-  updateBrand,
-} from "../../services/brandService/brandSlice";
-import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useEffect } from "react";
+import { useBrandStore } from "../../stores/brandStore";
 
 export default function BrandDetail({ brandId, onClose }) {
-  const dispatch = useDispatch();
+  const { brandGetById, brandUpdate, isLoading, isSuccess, brand } =
+    useBrandStore();
 
   useEffect(() => {
-    dispatch(clearBrand());
-    dispatch(getBrandById(brandId));
-    return () => {
-      dispatch(clearBrand());
-    };
-  }, [dispatch, brandId]);
-
-  const Brand = useSelector((state) => state.brand.brand?.data);
-  console.log(Brand)
-  const { isSuccess, isLoading } = useSelector((state) => state.brand);
+    brandGetById(brandId);
+  }, [brandId]);
 
   let validationSchema = Yup.object({
     name: Yup.string().required("Name is required"),
@@ -31,16 +19,14 @@ export default function BrandDetail({ brandId, onClose }) {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      name: Brand?.name || "",
+      name: brand?.name || "",
     },
     validationSchema,
     onSubmit: async (values) => {
-      dispatch(
-        updateBrand({
-          id: brandId,
-          data: values,
-        }),
-      );
+      brandUpdate({
+        id: brandId,
+        data: values,
+      });
     },
   });
 

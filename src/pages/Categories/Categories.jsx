@@ -1,17 +1,17 @@
 import { useEffect, useState } from "react";
-import {
-  deleteCategory,
-  getCategories,
-  resetCategoryState,
-} from "../../services/categoryService/categorySlice";
-import { useDispatch, useSelector } from "react-redux";
 import Table from "../../components/TableModal/Table";
 import CategoryDetail from "./CategoryDetail";
 import AddCategory from "./AddCategory";
 import ConfirmModal from "../../components/ConfirmDialog";
+import { useCategoryStore } from "../../stores/categoryStore";
 
 const Categories = () => {
-  const dispatch = useDispatch();
+  const {
+    categoryDeleteById,
+    categoryGetAll,
+    clearState,
+    categories,
+  } = useCategoryStore();
   const [categoryId, setCategoryId] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
   const [confirmId, setConfirmId] = useState(null);
@@ -23,28 +23,26 @@ const Categories = () => {
   };
 
   useEffect(() => {
-    dispatch(getCategories());
-  }, [dispatch]);
+    categoryGetAll();
+  }, []);
 
-  const categoriesState = useSelector((state) => state.category.categories.data);
-  console.log(categoriesState)
-  const categories = [];
-  for (let i = 0; i < categoriesState?.length; i++) {
-    categories.push({
+  const data = [];
+  for (let i = 0; i < categories?.length; i++) {
+    data.push({
       key: i + 1,
-      id: categoriesState[i]._id,
-      name: categoriesState[i].categoryName,
+      id: categories[i]._id,
+      name: categories[i].categoryName,
     });
   }
   const handleView = (e) => {
-    dispatch(resetCategoryState()); // 🔥 IMPORTANT
+    clearState();
     setCategoryId(e.id);
   };
-  const handleCloseAddBrand = (reload = true) => {
+  const handleCloseAddCate = (reload = true) => {
     setShowAdd(false);
     setCategoryId(null);
     if (reload) {
-      dispatch(getCategories());
+      categoryGetAll();
     }
   };
 
@@ -57,20 +55,25 @@ const Categories = () => {
             onClick={() => setShowAdd(true)}
             className="bg-[var(--color-fdaa3d)] text-white px-4 py-2 rounded-xl cursor-pointer"
           >
-            + Add Brand
+            + Add Category
           </button>
         </div>
 
         <Table
-          data={categories}
+          data={data}
           onDelete={(e) => handleDeleteClick(e)}
           onView={(e) => handleView(e)}
         />
 
-        {showAdd && <AddBrand onClose={handleCloseAddBrand} onAdd={addCategory} />}
+        {showAdd && (
+          <AddCategory onClose={handleCloseAddCate} onAdd={addCategory} />
+        )}
 
         {categoryId && (
-          <CategoryDetail categoryId={categoryId} onClose={handleCloseAddBrand} />
+          <CategoryDetail
+            categoryId={categoryId}
+            onClose={handleCloseAddCate}
+          />
         )}
       </div>
 
@@ -82,10 +85,12 @@ const Categories = () => {
           confirmText="Delete"
           onCancel={() => setConfirmId(null)}
           onConfirm={() => {
-            dispatch(deleteCategory(confirmId))
-              .unwrap()
+            categoryDeleteById(confirmId)
               .then(() => {
-                dispatch(getCategories());
+                categoryGetAll();
+                setConfirmId(null);
+              })
+              .catch(() => {
                 setConfirmId(null);
               });
           }}

@@ -1,46 +1,32 @@
 import Modal from "../../components/TableModal/Modal";
 import CustomerInput from "../../components/CustomerInput";
-import {
-  getCategoryById,
-  clearCategory,
-  updateCategory,
-} from "../../services/categoryService/categorySlice";
-import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useEffect } from "react";
+import { useCategoryStore } from "../../stores/categoryStore";
 
 export default function CategoryDetail({ categoryId, onClose }) {
-  const dispatch = useDispatch();
+  const { categoryGetById, categoryUpdate, isSuccess, isLoading, category } =
+    useCategoryStore();
 
   useEffect(() => {
-    dispatch(clearCategory());
-    dispatch(getCategoryById(categoryId));
-    return () => {
-      dispatch(clearCategory());
-    };
-  }, [dispatch, categoryId]);
-
-  const Category = useSelector((state) => state.category.category?.data);
-  console.log(Category)
-  const { isSuccess, isLoading } = useSelector((state) => state.category);
+    categoryGetById(categoryId);
+  }, [categoryId]);
 
   let validationSchema = Yup.object({
-    name: Yup.string().required("Name is required"),
+    categoryName: Yup.string().required("Name is required"),
   });
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      name: Category?.categoryName || "",
+      categoryName: category?.categoryName || "",
     },
     validationSchema,
     onSubmit: async (values) => {
-      dispatch(
-        updateCategory({
-          id: categoryId,
-          data: values,
-        }),
-      );
+      categoryUpdate({
+        id: categoryId,
+        data: values,
+      });
     },
   });
 
@@ -64,8 +50,8 @@ export default function CategoryDetail({ categoryId, onClose }) {
                 <div className="space-y-4">
                   <div className="grid grid-cols-1 gap-4">
                     <CustomerInput
-                      onChange={formik.handleChange("name")}
-                      value={formik.values.name}
+                      onChange={formik.handleChange("categoryName")}
+                      value={formik.values.categoryName}
                       type="text"
                       label="category name"
                       i_class="w-full pl-4 pr-4 py-2.5 bg-gray-100 border border-gray-300
@@ -73,9 +59,9 @@ export default function CategoryDetail({ categoryId, onClose }) {
             focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
                       placeholder="category Name"
                     />
-                    {formik.touched.name && formik.errors.name && (
+                    {formik.touched.categoryName && formik.errors.categoryName && (
                       <div className="text-red-500 text-sm">
-                        {formik.errors.name}
+                        {formik.errors.categoryName}
                       </div>
                     )}
                   </div>

@@ -1,17 +1,12 @@
 import Modal from "../../components/TableModal/Modal";
 import CustomerInput from "../../components/CustomerInput";
-import {
-  createBrand,
-} from "../../services/brandService/brandSlice";
-import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import { useEffect } from "react";
 import { useCallback } from "react";
+import { useBrandStore } from "../../stores/brandStore";
 
 export default function AddBrand({ onClose }) {
-  const dispatch = useDispatch();
-  const { isSuccess, isLoading } = useSelector((state) => state.brand);
+  const { brandCreate, isSuccess, isLoading } = useBrandStore();
 
   let validationSchema = Yup.object({
     name: Yup.string().required("Name is required"),
@@ -19,13 +14,11 @@ export default function AddBrand({ onClose }) {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      name:"",
+      name: "",
     },
     validationSchema,
     onSubmit: async (values) => {
-      dispatch(
-        createBrand(values),
-      );
+      brandCreate(values);
     },
   });
 
