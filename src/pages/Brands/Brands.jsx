@@ -1,17 +1,12 @@
 import { useEffect, useState } from "react";
-import {
-  deleteBrand,
-  getBrands,
-  resetBrandState,
-} from "../../services/brandService/brandSlice";
-import { useDispatch, useSelector } from "react-redux";
 import Table from "../../components/TableModal/Table";
 import BrandDetail from "./BrandDetail";
 import AddBrand from "./AddBrand";
 import ConfirmModal from "../../components/ConfirmDialog";
+import { useBrandStore } from "../../stores/brandStore";
 
 const Brands = () => {
-  const dispatch = useDispatch();
+  const {brandDeleteById, brandGetAll, clearState, brands } = useBrandStore();
   const [brandId, setBrandId] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
   const [confirmId, setConfirmId] = useState(null);
@@ -23,28 +18,26 @@ const Brands = () => {
   };
 
   useEffect(() => {
-    dispatch(getBrands());
-  }, [dispatch]);
+    brandGetAll();
+  }, []);
 
-  const brandsState = useSelector((state) => state.brand.brands.data);
-  console.log(brandsState)
-  const brands = [];
-  for (let i = 0; i < brandsState?.length; i++) {
-    brands.push({
+  const data = [];
+  for (let i = 0; i < brands?.length; i++) {
+    data.push({
       key: i + 1,
-      id: brandsState[i]._id,
-      name: brandsState[i].name,
+      id: brands[i]._id,
+      name: brands[i].name,
     });
   }
   const handleView = (e) => {
-    dispatch(resetBrandState());
+    clearState();
     setBrandId(e.id);
   };
   const handleCloseAddBrand = (reload = true) => {
     setShowAdd(false);
     setBrandId(null);
     if (reload) {
-      dispatch(getBrands());
+      brandGetAll();
     }
   };
 
@@ -62,7 +55,7 @@ const Brands = () => {
         </div>
 
         <Table
-          data={brands}
+          data={data}
           onDelete={(e) => handleDeleteClick(e)}
           onView={(e) => handleView(e)}
         />
@@ -82,10 +75,12 @@ const Brands = () => {
           confirmText="Delete"
           onCancel={() => setConfirmId(null)}
           onConfirm={() => {
-            dispatch(deleteBrand(confirmId))
-              .unwrap()
+             brandDeleteById(confirmId)
               .then(() => {
-                dispatch(getBrands()); // 🔥 reload table
+                brandGetAll();
+                setConfirmId(null);
+              })
+              .catch(() => {
                 setConfirmId(null);
               });
           }}

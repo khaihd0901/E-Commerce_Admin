@@ -11,3 +11,6 @@ createRoot(document.getElementById('root')).render(
     </Provider>
   </StrictMode>,
 )
+
+console.log(document.getElementById('root'))
+console.log('main.jsx loaded')

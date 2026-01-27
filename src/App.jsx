@@ -19,7 +19,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           {/* Public routes */}
-          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Login />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
 
           {/*Protected admin routes */}

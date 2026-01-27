@@ -1,30 +1,17 @@
 import Modal from "../../components/TableModal/Modal";
 import CustomerInput from "../../components/CustomerInput";
-import {
-  getCouponById,
-  clearCoupon,
-  updateCoupon,
-} from "../../services/couponService/couponSlice";
-import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useEffect } from "react";
+import { useCouponStore } from "../../stores/couponStore";
 
 export default function CouponDetail({ couId, onClose }) {
-  const dispatch = useDispatch();
+    const {couponGetById,couponUpdate, isSuccess, isLoading, coupon} = useCouponStore();
 
   useEffect(() => {
-    dispatch(clearCoupon());
-    dispatch(getCouponById(couId));
-    return () => {
-      dispatch(clearCoupon());
-    };
-  }, [dispatch, couId]);
+    couponGetById(couId)
+  }, [couId]);
 
-  const couState = useSelector((state) => state.coupon.coupon?.data);
-  const { isSuccess, isLoading } = useSelector((state) => state.coupon);
-
-  console.log("issucess", isSuccess);
   let validationSchema = Yup.object({
     code: Yup.string().required("Code Name is required"),
     des: Yup.string().required("Description is required"),
@@ -37,23 +24,21 @@ export default function CouponDetail({ couId, onClose }) {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      code: couState?.code || "",
-      des: couState?.des || "",
-      discountValue: couState?.discountValue || 0,
-      minPurchaseAmount: couState?.minPurchaseAmount || 0,
-      maxUses: couState?.maxUses || 0,
-      expiryDate: couState?.expiryDate|| '',
-      isActive: couState?.isActive || false,
+      code: coupon?.code || "",
+      des: coupon?.des || "",
+      discountValue: coupon?.discountValue || 0,
+      minPurchaseAmount: coupon?.minPurchaseAmount || 0,
+      maxUses: coupon?.maxUses || 0,
+      expiryDate: coupon?.expiryDate|| '',
+      isActive: coupon?.isActive || false,
     },
     validationSchema,
     onSubmit: async (values) => {
-      dispatch(
-        updateCoupon({
+        couponUpdate({
           id: couId,
           data: values,
-        }),
-      );
-    },
+        })
+    }
   });
 
   useEffect(()=>{

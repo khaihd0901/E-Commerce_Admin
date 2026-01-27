@@ -1,8 +1,5 @@
 import Modal from "../../components/TableModal/Modal";
 import CustomerInput from "../../components/CustomerInput";
-import {
-  clearProduct,
-} from "../../services/productService/productSlice";
 import { getCategories } from "../../services/categoryService/categorySlice";
 import { getBrands } from "../../services/brandService/brandSlice";
 
@@ -23,11 +20,7 @@ const DetailProduct = ({ onClose, prodId }) => {
   useEffect(() => {
     dispatch(getBrands());
     dispatch(getCategories());
-    dispatch(clearProduct());
 
-    return () => {
-      dispatch(clearProduct());
-    };
   }, [dispatch, prodId]);
 
   useEffect(() =>{

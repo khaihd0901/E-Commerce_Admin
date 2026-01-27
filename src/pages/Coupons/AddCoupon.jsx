@@ -1,15 +1,13 @@
 import React from "react";
 import Modal from "../../components/TableModal/Modal";
 import CustomerInput from "../../components/CustomerInput";
-import { createCoupon } from "../../services/couponService/couponSlice";
-import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useCallback } from "react";
+import { useCouponStore } from "../../stores/couponStore";
 
 const AddCoupon = ({ onClose }) => {
-  const dispatch = useDispatch();
-  const { isLoading, isSuccess } = useSelector((state) => state.coupon);
+    const{couponCreate, isLoading,isSuccess} = useCouponStore();
 
   const validationSchema = Yup.object({
     code: Yup.string().required("Code Name is required"),
@@ -33,7 +31,7 @@ const AddCoupon = ({ onClose }) => {
     },
     validationSchema,
     onSubmit: (values) => {
-      dispatch(createCoupon(values));
+      couponCreate(values)
     },
   });
 

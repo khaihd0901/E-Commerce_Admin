@@ -1,17 +1,13 @@
 import { useEffect, useState } from "react";
-import {
-  deleteCoupon,
-  getCoupons,
-  resetCouponState,
-} from "../../services/couponService/couponSlice";
-import { useDispatch, useSelector } from "react-redux";
 import Table from "../../components/TableModal/Table";
 import CouponDetail from "./CouponDetail";
 import AddCoupon from "./AddCoupon";
 import ConfirmModal from "../../components/ConfirmDialog";
+import { useCouponStore } from "../../stores/couponStore";
 
 const Coupons = () => {
-  const dispatch = useDispatch();
+  const { couponDeleteById, couponGetAll, clearState, coupons } =
+    useCouponStore();
   const [couId, setCouId] = useState(null);
   const [showAdd, setShowAdd] = useState(false);
   const [confirmId, setConfirmId] = useState(null);
@@ -23,36 +19,35 @@ const Coupons = () => {
   };
 
   useEffect(() => {
-    dispatch(getCoupons());
-  }, [dispatch]);
+    couponGetAll();
+  }, []);
 
-  const couponsState = useSelector((state) => state.coupon.coupons?.data);
-  const coupons = [];
-  for (let i = 0; i < couponsState?.length; i++) {
-    coupons.push({
+  const data = [];
+  for (let i = 0; i < coupons?.length; i++) {
+    data.push({
       key: i + 1,
-      id: couponsState[i]._id,
-      name: couponsState[i].code,
-      description: couponsState[i].des,
-      value: couponsState[i].discountValue,
-      minPurchaseAmount: couponsState[i].minPurchaseAmount,
-      maxUses: couponsState[i].maxUses,
-      currentUses: couponsState[i].currentUses,
-      expiryDate: couponsState[i].expiryDate,
-      isActive: couponsState[i].isActive == true ? "Activated" : "Inactive",
-      createdAt: couponsState[i].createdAt,
-      updatedAt: couponsState[i].updatedAt,
+      id: coupons[i]._id,
+      name: coupons[i].code,
+      description: coupons[i].des,
+      value: coupons[i].discountValue,
+      minPurchaseAmount: coupons[i].minPurchaseAmount,
+      maxUses: coupons[i].maxUses,
+      currentUses: coupons[i].currentUses,
+      expiryDate: coupons[i].expiryDate,
+      isActive: coupons[i].isActive == true ? "Activated" : "Inactive",
+      createdAt: coupons[i].createdAt,
+      updatedAt: coupons[i].updatedAt,
     });
   }
   const handleView = (e) => {
-    dispatch(resetCouponState()); // 🔥 IMPORTANT
+    clearState();
     setCouId(e.id);
   };
   const handleCloseAddCoupon = (reload = true) => {
-    setShowAdd(false)
+    setShowAdd(false);
     setCouId(null);
-    if(reload){
-      dispatch(getCoupons());
+    if (reload) {
+      couponGetAll();
     }
   };
 
@@ -70,7 +65,7 @@ const Coupons = () => {
         </div>
 
         <Table
-          data={coupons}
+          data={data}
           onDelete={(e) => handleDeleteClick(e)}
           onView={(e) => handleView(e)}
         />
@@ -90,10 +85,12 @@ const Coupons = () => {
           confirmText="Delete"
           onCancel={() => setConfirmId(null)}
           onConfirm={() => {
-            dispatch(deleteCoupon(confirmId))
-              .unwrap()
+            couponDeleteById(confirmId)
               .then(() => {
-                dispatch(getCoupons()); // 🔥 reload table
+                couponGetAll();
+                setConfirmId(null);
+              })
+              .catch(() => {
                 setConfirmId(null);
               });
           }}
