@@ -32,6 +32,7 @@ const Categories = () => {
       key: i + 1,
       id: categories[i]._id,
       name: categories[i].categoryName,
+      products: categories[i].products.length,
     });
   }
   const handleView = (e) => {

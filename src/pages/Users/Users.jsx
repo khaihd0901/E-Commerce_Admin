@@ -1,29 +1,27 @@
 import React from 'react'
 import { useEffect, useState } from "react";
-import { getUsers } from "../../services/uerService/userSlice";
-import { useDispatch, useSelector } from "react-redux";
 import Table from "../../components/TableModal/Table";
 import DetailModal from "../../components/TableModal/DetailModal";
+import {useUserStore} from '../../stores/userStore'
 const Orders = () => {
-      const dispatch = useDispatch();
+  const {userGetAll, users} = useUserStore();
   const [selectUser, setSelectUser] = useState(null);
 
   const deleteUser = (id) => {};
 
   useEffect(() => {
-    dispatch(getUsers());
+    userGetAll();
   }, []);
 
-  const usersState = useSelector((state) => state.user.users.data);
-  const users = [];
-  for (let i = 0; i < usersState?.length; i++) {
-    users.push({
+  const data = [];
+  for (let i = 0; i < users?.length; i++) {
+    data.push({
       key: i + 1,
-      userId: usersState[i]._id,
-      username: usersState[i].username,
-      phone: usersState[i].phone,
-      createdAt: usersState[i].createdAt,
-      accountVerified: ((usersState[i].isVerified === true) ? "Verified" : "Not Verify"),
+      userId: users[i]._id,
+      username: users[i].username,
+      phone: users[i].phone,
+      createdAt: users[i].createdAt,
+      accountVerified: ((users[i].isVerified === true) ? "Verified" : "Not Verify"),
     });
   }
   console.log(users)
@@ -34,7 +32,7 @@ const Orders = () => {
       </div>
 
       <Table
-        data={users}
+        data={data}
         onDelete={deleteUser}
         onView={setSelectUser}
       />

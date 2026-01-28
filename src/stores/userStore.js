@@ -1,40 +1,41 @@
 import { create } from "zustand";
 import { toast } from "sonner"; 
-import orderService from "../services/orderService";
+import userService from "../services/userService";
 
-export const useOrderStore =create((set,get) =>({
-    orders: [],
-  order: null,
+export const useUserStore =create((set,get) =>({
+    users: [],
+  user: null,
   isLoading: false,
   isSuccess: false,
   isError: false,
 
-  setOrders: (data) => {
+  setUsers: (data) => {
     set({
-      orders: data,
+      users: data,
     });
   },
-  setOrder: (data) => {
+  setUser: (data) => {
     set({
-      order: data,
+      user: data,
     });
   },
   clearState: () => {
     set({
-      orders: [],
-      order: null,
+      products: [],
+      product: null,
       images: [],
       isLoading: false,
       isSuccess: false,
       isError: false,
     });
   },
-  orderGetAll: async () =>{
+  userGetAll: async () =>{
     try{
         set({isLoading: true});
-        const order = await orderService.getUserOrders();
-        if(order){
-            get().setOrders(order)
+        const user = await userService.getUsers();
+        console.log(user)
+        if(user){
+            get().setUsers(user)
         };
         set({isSuccess: true})
     }catch(err){

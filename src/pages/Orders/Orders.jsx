@@ -1,32 +1,31 @@
 import React from 'react'
 import { useEffect, useState } from "react";
-import { getUserOrders } from "../../services/OrderService/orderSlice";
-import { useDispatch, useSelector } from "react-redux";
 import Table from "../../components/TableModal/Table";
 import DetailModal from "../../components/TableModal/DetailModal";
+import {useOrderStore} from '../../stores/orderStore.js'
 const Orders = () => {
-      const dispatch = useDispatch();
+  const {orderGetAll, orders} = useOrderStore();
+
   const [selectOrder, setSelectOrder] = useState(null);
 
   // const deleteOrder = (id) => {};
 
   useEffect(() => {
-    dispatch(getUserOrders());
+    orderGetAll();
   }, []);
 
-  const ordersState = useSelector((state) => state.order.orders.data);
-  const orders = [];
-  for (let i = 0; i < ordersState?.length; i++) {
-    orders.push({
+  const data = [];
+  for (let i = 0; i < orders?.length; i++) {
+    data.push({
       key: i + 1,
-      orderId: ordersState[i]._id,
-      orderBy: ordersState[i].orderBy.username,
-      orderStatus: ordersState[i].status,
-      totalAmount: ordersState[i].totalAmount,
-      createdAt: ordersState[i].createdAt
+      orderId: orders[i]._id,
+      orderBy: orders[i].orderBy.username,
+      orderStatus: orders[i].status,
+      totalAmount: orders[i].totalAmount,
+      createdAt: orders[i].createdAt
     });
   }
-  console.log(ordersState)
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen rounded-xl shadow">
       <div className="flex justify-between mb-6">
@@ -34,7 +33,7 @@ const Orders = () => {
       </div>
 
       <Table
-        data={orders}
+        data={data}
         // onDelete={deleteOrder}
         onView={setSelectOrder}
       />

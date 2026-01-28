@@ -27,6 +27,7 @@ const Brands = () => {
       key: i + 1,
       id: brands[i]._id,
       name: brands[i].name,
+      products: brands[i].products.length
     });
   }
   const handleView = (e) => {

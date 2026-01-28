@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import productService from "../services/productService";
+import { toast } from "sonner";
 
 export const useProductStore = create((set, get) => ({
   products: [],
@@ -66,6 +67,7 @@ export const useProductStore = create((set, get) => ({
       set({ isLoading: true });
       await productService.createProduct(data);
       set({ isSuccess: true });
+      toast.success("Create product Success")
     } catch (err) {
       console.log(err);
       set({ isError: true });
@@ -80,6 +82,9 @@ export const useProductStore = create((set, get) => ({
       set({ isLoading: true });
       const res = await productService.updateProduct(id,data);
       console.log("data", res);
+      set({isSuccess: true})
+      toast.success("Update product Success")
+
     } catch (err) {
       console.log(err);
       set({ isError: true });
@@ -93,8 +98,8 @@ export const useProductStore = create((set, get) => ({
     try {
       set({ isLoading: true });
       await productService.deleteProductById(id);
-
       set({ isSuccess: true });
+      toast.success("Delete product Success")
     } catch (err) {
       console.log(err);
       set({ isError: true });

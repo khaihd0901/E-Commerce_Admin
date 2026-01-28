@@ -1,27 +1,25 @@
 import Modal from "../../components/TableModal/Modal";
 import CustomerInput from "../../components/CustomerInput";
-import { getCategories } from "../../services/categoryService/categorySlice";
-import { getBrands } from "../../services/brandService/brandSlice";
-
-import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useCallback, useEffect, useState } from "react";
 import UploadImage from "./UploadImage";
 import { useProductStore } from "../../stores/productStore";
+import { useBrandStore } from "../../stores/brandStore";
+import { useCategoryStore } from "../../stores/categoryStore";
+
 
 export default function AddProductModal({ onClose }) {
   const {productCreate,productUploadImages, isLoading, isSuccess} = useProductStore();
+  const {categoryGetAll, categories} = useCategoryStore();
+  const {brandGetAll, brands} = useBrandStore();
+
   const [images, setImages] = useState();
-  const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(getBrands());
-    dispatch(getCategories());
-  }, [dispatch]);
-
-  const brandState = useSelector((state) => state.brand.brands?.data);
-  const cateState = useSelector((state) => state.category.categories?.data);
+    categoryGetAll();
+    brandGetAll();
+  }, []);
 
   let validationSchema = Yup.object({
     title: Yup.string().required("Product name is required"),
@@ -153,7 +151,7 @@ export default function AddProductModal({ onClose }) {
     focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
                       >
                         <option value="">Select category</option>
-                        {cateState?.map((c, index) => (
+                        {categories?.map((c, index) => (
                           <option key={index} value={c._id}>
                             {c.categoryName}
                           </option>
@@ -178,7 +176,7 @@ export default function AddProductModal({ onClose }) {
     focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
                       >
                         <option value="">Select brand</option>
-                        {brandState?.map((b, index) => (
+                        {brands?.map((b, index) => (
                           <option key={index} value={b._id}>
                             {b.name}
                           </option>

@@ -1,33 +1,30 @@
 import Modal from "../../components/TableModal/Modal";
 import CustomerInput from "../../components/CustomerInput";
-import { getCategories } from "../../services/categoryService/categorySlice";
-import { getBrands } from "../../services/brandService/brandSlice";
-
-import { useDispatch, useSelector } from "react-redux";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useCallback, useEffect, useState } from "react";
 import UploadImage from "./UploadImage";
 import { useProductStore } from "../../stores/productStore";
+import { useCategoryStore } from "../../stores/categoryStore";
+import { useBrandStore } from "../../stores/brandStore";
 
 const DetailProduct = ({ onClose, prodId }) => {
   const [images, setImages] = useState();
   const [deletedImages, setDeletedImages] = useState();
 
   const {productGetById, product, productUploadImages,productUpdate, isSuccess, isLoading} = useProductStore();
-  const dispatch = useDispatch();
+    const {categoryGetAll, categories} = useCategoryStore();
+    const {brandGetAll, brands} = useBrandStore();
 
   useEffect(() => {
-    dispatch(getBrands());
-    dispatch(getCategories());
+    categoryGetAll();
+    brandGetAll();
 
-  }, [dispatch, prodId]);
+  }, []);
 
   useEffect(() =>{
     productGetById(prodId)
   },[])
-  const brandState = useSelector((state) => state.brand.brands.data);
-  const cateState = useSelector((state) => state.category.categories.data);
 
   const handleImageChange = useCallback((files, removedAssetIds) => {
     setImages(files);
@@ -107,7 +104,7 @@ const DetailProduct = ({ onClose, prodId }) => {
           <div className="grid grid-cols-12 gap-4">
             {/* LEFT */}
             <div className="col-span-12 lg:col-span-4 space-y-6">
-              <div className="w-full h-56">
+              <div className="max-w-lg h-56">
                 <UploadImage
                   onChange={handleImageChange}
                   images={product?.images}
@@ -168,7 +165,7 @@ const DetailProduct = ({ onClose, prodId }) => {
     focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
                       >
                         <option value="">Select category</option>
-                        {cateState?.map((c, index) => (
+                        {categories?.map((c, index) => (
                           <option key={index} value={c._id}>
                             {c.categoryName}
                           </option>
@@ -193,7 +190,7 @@ const DetailProduct = ({ onClose, prodId }) => {
     focus:ring-2 focus:ring-[var(--color-fdaa3d)] focus:border-transparent transition-all"
                       >
                         <option value="">Select brand</option>
-                        {brandState?.map((b, index) => (
+                        {brands?.map((b, index) => (
                           <option key={index} value={b._id}>
                             {b.name}
                           </option>
